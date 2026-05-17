@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encode · Fleet Merits</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/auth.js"></script>
+<style>
+:root{--bg:#06060d;--bg2:#0d0d18;--sur:#111120;--sur2:#181828;--bor:rgba(255,255,255,0.06);--bor2:rgba(255,255,255,0.12);--acc:#5b8dee;--acc2:#7c5cfc;--tx:#eeeef5;--tx2:#9999b0;--tx3:#5a5a72;--ok:#34d399;--bad:#f87171;--warn:#fbbf24;--pur:#8b5cf6;--teal:#22d3ee}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(91,141,238,0.04)1px,transparent 1px),linear-gradient(90deg,rgba(91,141,238,0.04)1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+.page{position:relative;z-index:1}
+
+nav{display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--bor);backdrop-filter:blur(20px);position:sticky;top:0;z-index:200;background:rgba(6,6,13,0.88)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo-img{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 0 6px rgba(91,141,238,0.35))}
+.nav-name{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.4px}
+.nav-name span{color:var(--acc)}
+.nav-links{display:flex;gap:6px;align-items:center}
+.nb{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;border:1px solid var(--bor);background:transparent;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif}
+.nb:hover{border-color:var(--acc);color:var(--acc)}
+.nb.act{background:var(--acc);color:#fff;border-color:var(--acc)}
+.user-pill{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 6px;border-radius:100px;background:var(--sur);border:1px solid var(--bor2);font-size:12px;color:var(--tx2)}
+.u-av{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+
+/* MENU DRAWER */
+.mbtn{width:40px;height:40px;border-radius:8px;border:1px solid #fff;background:var(--acc);cursor:pointer;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;margin-left:8px}
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:150;display:none}
+.moverlay.on{display:block}
+.mdrawer{position:fixed;top:0;right:0;width:280px;height:100vh;background:#111120;border-left:1px solid var(--bor2);z-index:160;padding:0;transform:translateX(100%);transition:transform .3s}
+.mdrawer.on{transform:translateX(0)}
+.mhdr{padding:18px 20px;border-bottom:1px solid var(--bor);display:flex;justify-content:space-between;align-items:center}
+.mc{padding:10px 0}
+.mi{display:flex;align-items:center;padding:14px 20px;font-size:14px;font-weight:500;color:var(--tx2);text-decoration:none;border-left:3px solid transparent;transition:all .2s}
+.mi:hover{border-color:var(--acc);color:var(--tx);background:rgba(91,141,238,0.06)}
+.mi.act{border-color:var(--acc);color:var(--acc);background:rgba(91,141,238,0.08)}
+.menu-admin,.menu-encode,.menu-feedback{display:none}
+
+/* AUTH GATE */
+#authGate{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 68px);gap:14px;padding:32px}
+.gate-card{background:var(--sur);border:1px solid var(--bor2);border-radius:18px;padding:32px;width:100%;max-width:360px;text-align:center}
+.gate-card h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px}
+.gate-card p{color:var(--tx2);font-size:13px;margin-bottom:22px;line-height:1.5}
+.google-btn{width:100%;padding:12px;border-radius:10px;border:1px solid var(--bor2);background:var(--sur2);color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.google-btn:hover{border-color:var(--acc);background:rgba(91,141,238,0.07)}
+.google-icon{width:18px;height:18px;flex-shrink:0}
+.denied-msg{color:var(--bad);font-size:13px;margin-top:10px;display:none}
+
+/* APP */
+#appContent{display:none;max-width:760px;margin:0 auto;padding:32px 20px}
+.page-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:2px}
+.page-sub{color:var(--tx2);font-size:13px;margin-bottom:22px}
+.op-bar{display:flex;align-items:center;justify-content:space-between;background:rgba(91,141,238,0.07);border:1px solid rgba(91,141,238,0.16);border-radius:10px;padding:10px 16px;margin-bottom:22px}
+.op-info{font-size:12px;color:var(--tx2)}
+.op-email{font-size:13px;font-weight:600;color:var(--acc)}
+.op-out{font-size:12px;color:var(--tx3);cursor:pointer;text-decoration:underline}
+.op-out:hover{color:var(--bad)}
+
+/* MAIN TABS */
+.main-tabs{display:flex;gap:5px;background:var(--sur2);border-radius:12px;padding:4px;margin-bottom:24px;overflow-x:auto}
+.mt-btn{flex:1;padding:9px 14px;border-radius:9px;border:none;background:transparent;font-size:13px;font-weight:600;cursor:pointer;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;min-width:80px}
+.mt-btn.m-act{background:var(--sur);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+
+/* SECTION PANELS */
+.sec-panel{display:none}.sec-panel.vis{display:block}
+
+/* ENCODE MODE BAR */
+.mode-bar{display:flex;gap:5px;background:var(--sur2);border-radius:10px;padding:4px;margin-bottom:20px}
+.mb-btn{flex:1;padding:9px 6px;border-radius:7px;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--tx3);transition:all .2s;font-family:'DM Sans',sans-serif;text-align:center}
+.mb-btn.am.active{background:#1a3a1a;color:var(--ok);box-shadow:0 0 0 1px rgba(52,211,153,0.2)}
+.mb-btn.av.active{background:#3a1a1a;color:var(--bad);box-shadow:0 0 0 1px rgba(248,113,113,0.2)}
+.mb-btn.qu.active{background:#1a2a3a;color:var(--acc);box-shadow:0 0 0 1px rgba(91,141,238,0.2)}
+.mb-btn.te.active{background:#2a1a3a;color:#c4b5fd;box-shadow:0 0 0 1px rgba(139,92,246,0.2)}
+
+.sec-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.chip{padding:5px 12px;border-radius:100px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid transparent;background:var(--sur2);color:var(--tx3);transition:all .15s}
+.chip.sel-ok{background:rgba(52,211,153,0.1);border-color:rgba(52,211,153,0.35);color:var(--ok)}
+.chip.sel-bad{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.35);color:var(--bad)}
+.chip:hover{border-color:var(--bor2);color:var(--tx)}
+.chip.dashed{border-style:dashed;border-color:var(--bor)}
+
+.r-inp{width:100%;background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;margin-bottom:12px}
+.r-inp:focus{border-color:var(--acc)}
+.r-inp::placeholder{color:var(--tx3)}
+
+.col-heads{display:grid;gap:6px;padding:0 2px;margin-bottom:4px}
+.c3{grid-template-columns:1fr 80px 32px}
+.c4{grid-template-columns:1fr 80px 80px 32px}
+.c-team{grid-template-columns:80px 1fr 80px 32px}
+.ch{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em}
+
+.entry-row{display:grid;gap:6px;margin-bottom:5px;align-items:center}
+.er3{grid-template-columns:1fr 80px 32px}
+.er4{grid-template-columns:1fr 80px 80px 32px}
+.er-team{grid-template-columns:80px 1fr 80px 32px}
+
+input[type=text],input[type=number],input[type=date],select{background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;width:100%}
+input:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(91,141,238,0.1)}
+input::placeholder{color:var(--tx3)}
+input[type=number]{text-align:center}
+select option{background:var(--sur2)}
+
+.rm-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--bor);background:transparent;color:var(--tx3);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.rm-btn:hover{background:rgba(248,113,113,.12);border-color:#fca5a5;color:var(--bad)}
+.add-btn{width:100%;padding:8px;border-radius:8px;border:1px dashed var(--bor);background:transparent;color:var(--tx3);font-size:12px;cursor:pointer;margin:5px 0 16px;transition:all .15s;font-family:'DM Sans',sans-serif}
+.add-btn:hover{border-color:var(--acc);color:var(--acc)}
+
+.name-wrap{position:relative}
+.name-drop{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--sur2);border:1px solid var(--bor2);border-radius:8px;z-index:60;overflow:hidden;display:none;max-height:140px;overflow-y:auto;box-shadow:0 6px 20px rgba(0,0,0,0.3)}
+.name-item{padding:8px 12px;font-size:12px;cursor:pointer;color:var(--tx);transition:background .15s;border-bottom:1px solid var(--bor)}
+.name-item:last-child{border-bottom:none}
+.name-item:hover{background:rgba(91,141,238,.1);color:var(--acc)}
+
+.sub-bar{display:flex;gap:8px;align-items:center}
+.sub-btn{flex:1;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.sub-btn:hover:not(:disabled){opacity:.85;transform:translateY(-1px)}
+.sub-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.sub-btn.ok{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 4px 12px rgba(34,197,94,0.25)}
+.sub-btn.red{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+.sub-btn.blue{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+.sub-btn.pur{background:linear-gradient(135deg,var(--pur),#6d28d9);color:#fff}
+.cnt{font-size:12px;color:var(--tx2);white-space:nowrap}
+
+/* LOG */
+.log-sec{margin-top:28px}
+.log-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px}
+.log-item{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:8px;font-size:12px;background:var(--sur);border:1px solid var(--bor);margin-bottom:5px;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.log-name{font-weight:600}
+.log-det{color:var(--tx3);margin-top:1px}
+.log-pts{font-family:'Syne',sans-serif;font-weight:700;font-size:14px}
+
+/* CHECKER */
+.checker-wrap{padding:4px 0}
+.file-drop-zone{border:2px dashed rgba(91,141,238,0.25);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;background:rgba(91,141,238,0.03)}
+.file-drop-zone:hover{border-color:var(--acc);background:rgba(91,141,238,0.07)}
+.fdz-title{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:4px}
+.fdz-sub{font-size:12px;color:var(--tx3)}
+.fdz-sub strong{color:var(--acc)}
+#checkerInput{display:none}
+.checker-results{background:var(--sur);border:1px solid var(--bor);border-radius:12px;overflow:hidden;display:none}
+.cr-header{padding:14px 18px;border-bottom:1px solid var(--bor);display:flex;justify-content:space-between;align-items:center}
+.cr-title{font-size:13px;font-weight:700}
+.cr-stats{display:flex;gap:10px}
+.cr-stat{font-size:12px;font-weight:600;padding:3px 10px;border-radius:6px}
+.cr-stat.miss{background:rgba(248,113,113,.12);color:var(--bad)}
+.cr-stat.found{background:rgba(52,211,153,.1);color:var(--ok)}
+.cr-list{max-height:320px;overflow-y:auto;padding:12px 18px;display:flex;flex-direction:column;gap:4px}
+.cr-item{padding:8px 12px;border-radius:7px;font-size:13px;display:flex;align-items:center;justify-content:space-between}
+.cr-item.missing{background:rgba(248,113,113,.08);color:var(--bad);border:1px solid rgba(248,113,113,.15)}
+.cr-item.found{background:rgba(52,211,153,.06);color:var(--ok);border:1px solid rgba(52,211,153,.12)}
+.cr-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0}
+.cr-tag.miss{background:rgba(248,113,113,.2);color:var(--bad)}
+.cr-tag.ok{background:rgba(52,211,153,.15);color:var(--ok)}
+.export-btn{padding:9px 18px;border-radius:8px;border:none;background:var(--acc);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.export-btn:hover{opacity:.85}
+
+/* MAT */
+.mat-wrap{}
+.mat-header{background:rgba(91,141,238,0.07);border:1px solid rgba(91,141,238,0.15);border-radius:12px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.mat-loaded{font-size:13px;color:var(--ok);font-weight:600}
+.mat-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.mat-sides{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.mat-side{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:16px}
+.mat-side-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:4px}
+.mat-side-title.win{color:var(--ok)}
+.mat-side-title.loss{color:var(--bad)}
+.mat-side-sub{font-size:11px;color:var(--tx3);margin-bottom:12px}
+.mat-team-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.mat-players{display:flex;flex-direction:column;gap:5px;max-height:380px;overflow-y:auto;padding-right:2px}
+.mat-players::-webkit-scrollbar{width:4px}
+.mat-players::-webkit-scrollbar-track{background:transparent}
+.mat-players::-webkit-scrollbar-thumb{background:var(--bor2);border-radius:2px}
+.mat-submit-btn{width:100%;padding:13px;border-radius:12px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;margin-bottom:16px;transition:all .2s;box-shadow:0 4px 16px rgba(91,141,238,0.25);display:flex;align-items:center;justify-content:center;gap:8px}
+.mat-submit-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(91,141,238,0.35)}
+.mat-submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.send-icon{width:16px;height:16px;flex-shrink:0}
+.mat-records-section{margin-top:24px;padding-top:20px;border-top:1px solid var(--bor)}
+.mat-rec-title{font-size:12px;font-weight:700;color:var(--bad);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.mat-del-row{display:flex;gap:8px;align-items:center}
+.del-date-inp{flex:1}
+.del-btn{padding:9px 16px;border-radius:8px;border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.08);color:var(--bad);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s}
+.del-btn:hover{background:rgba(248,113,113,.18)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:11px 24px;border-radius:100px;font-size:13px;font-weight:600;z-index:999;display:none;white-space:nowrap;animation:toastIn .3s ease;box-shadow:0 6px 20px rgba(0,0,0,0.3)}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="page">
+<nav>
+  <div class="nav-brand">
+    <img src="../logo.png?v=2" class="nav-logo-img" alt="HR" onerror="this.style.display='none'">
+    <div class="nav-name">Fleet <span>Merits</span></div>
+  </div>
+  <div class="nav-links">
+    <div class="user-pill" id="userPill" style="display:none">
+      <div class="u-av" id="uAv">?</div>
+      <span id="uEmail">—</span>
+      <span style="cursor:pointer;color:var(--bad);margin-left:4px;font-size:14px" onclick="signOut()">×</span>
+    </div>
+    <button class="mbtn" onclick="toggleMenu()">
+      <span style="display:block;width:20px;height:3px;background:#fff;border-radius:2px"></span>
+      <span style="display:block;width:20px;height:3px;background:#fff;border-radius:2px"></span>
+      <span style="display:block;width:20px;height:3px;background:#fff;border-radius:2px"></span>
+    </button>
+  </div>
+</nav>
+<div class="moverlay" id="moverlay"></div>
+<div class="mdrawer" id="mdrawer">
+  <div class="mhdr">
+    <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px">Menu</span>
+    <button onclick="toggleMenu()" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:20px">×</button>
+  </div>
+  <div class="mc">
+    <a href="../index.html" class="mi menu-lookup">🔍 Lookup</a>
+    <a href="encode.html" class="mi menu-encode act">✏️ Encode</a>
+    <a href="admin.html" class="mi menu-admin">⚙️ Admin</a>
+    <a href="about.html" class="mi menu-about">📜 About</a>
+    <a href="feedback.html" class="mi menu-feedback">💬 Feedback</a>
+    <div style="border-top:1px solid var(--bor);margin:10px 20px"></div>
+    <a href="#" class="mi menu-logout" onclick="signOut()" style="color:var(--bad)">🚪 Logout</a>
+  </div>
+</div>
+
+<!-- AUTH GATE -->
+<div id="authGate">
+  <div class="gate-card">
+    <h2>Operator Access</h2>
+    <p>Sign in with your authorized Google account to access encoding.</p>
+    <button class="google-btn" onclick="signInWithGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="denied-msg" id="deniedMsg">Your account is not authorized. Contact an admin.</div>
+  </div>
+</div>
+
+<!-- APP CONTENT -->
+<div id="appContent">
+  <div class="page-title">Encode</div>
+  <div class="page-sub">Merit entries, checker, and MAT records.</div>
+  <div class="op-bar">
+    <div><div class="op-info">Logged in as</div><div class="op-email" id="opEmail">—</div></div>
+    <span class="op-out" onclick="signOut()">Sign out</span>
+  </div>
+
+  <!-- MAIN SECTION TABS -->
+  <div class="main-tabs" id="mainTabs">
+    <button class="mt-btn m-act" onclick="setMainTab('merits')">Merit Encoding</button>
+    <button class="mt-btn" onclick="setMainTab('checker')">Checker</button>
+    <button class="mt-btn" onclick="setMainTab('mat')">MAT</button>
+  </div>
+
+  <!-- ===================== MERIT ENCODING ===================== -->
+  <div class="sec-panel vis" id="sec-merits">
+    <div class="mode-bar">
+      <button class="mb-btn am active" onclick="setMode('merit')">+ Merit Award</button>
+      <button class="mb-btn av" onclick="setMode('availed')">− Availed</button>
+      <button class="mb-btn qu" onclick="setMode('quota')">✕ Quotas</button>
+      <button class="mb-btn te" onclick="setMode('team')">Team Award</button>
+    </div>
+
+    <!-- MERIT -->
+    <div class="sec-panel vis" id="panel-merit">
+      <div class="sec-label">Quick reason</div>
+      <div class="chips" id="meritChips">
+        <div class="chip sel-ok" onclick="pickChip(this,'merit')">Blood Donation</div>
+        <div class="chip" onclick="pickChip(this,'merit')">PathFIT Sail</div>
+        <div class="chip" onclick="pickChip(this,'merit')">Cheerdance</div>
+        <div class="chip" onclick="pickChip(this,'merit')">IMO Volunteer</div>
+        <div class="chip" onclick="pickChip(this,'merit')">Behavioral Focus</div>
+        <div class="chip" onclick="pickChip(this,'merit')">Cosplay</div>
+        <div class="chip dashed" onclick="focusR('meritR')">+ Custom</div>
+      </div>
+      <input class="r-inp" id="meritR" placeholder="Or type a custom reason…" oninput="clearChips('merit')">
+      <div class="col-heads c3"><div class="ch">Cadet name</div><div class="ch">Points</div><div></div></div>
+      <div id="meritRows"></div>
+      <button class="add-btn" onclick="addRow('merit')">+ Add cadet</button>
+      <div class="sub-bar">
+        <button class="sub-btn ok" id="subMerit" onclick="submitEntries('merit')">Submit Merit Entries</button>
+        <span class="cnt" id="cntMerit">0 cadets</span>
+      </div>
+    </div>
+
+    <!-- AVAILED -->
+    <div class="sec-panel" id="panel-availed">
+      <div class="sec-label">Reduction reason</div>
+      <div class="chips" id="availedChips">
+        <div class="chip sel-bad" onclick="pickChip(this,'availed')">Reduce ED</div>
+        <div class="chip" onclick="pickChip(this,'availed')">Offset DR</div>
+        <div class="chip" onclick="pickChip(this,'availed')">Phone Usage (DCO)</div>
+        <div class="chip" onclick="pickChip(this,'availed')">Weekend Usage</div>
+        <div class="chip dashed" onclick="focusR('availedR')">+ Custom</div>
+      </div>
+      <input class="r-inp" id="availedR" placeholder="Or type a custom reason…" oninput="clearChips('availed')">
+      <div class="col-heads c3"><div class="ch">Cadet name</div><div class="ch">Points</div><div></div></div>
+      <div id="availedRows"></div>
+      <button class="add-btn" onclick="addRow('availed')">+ Add cadet</button>
+      <div class="sub-bar">
+        <button class="sub-btn red" id="subAvailed" onclick="submitEntries('availed')">Submit Reductions</button>
+        <span class="cnt" id="cntAvailed">0 cadets</span>
+      </div>
+    </div>
+
+    <!-- QUOTA -->
+    <div class="sec-panel" id="panel-quota">
+      <div class="sec-label">Set quota values per cadet</div>
+      <div class="col-heads c4"><div class="ch">Cadet name</div><div class="ch">Quota DR</div><div class="ch">Quota ED</div><div></div></div>
+      <div id="quotaRows"></div>
+      <button class="add-btn" onclick="addRow('quota')">+ Add cadet</button>
+      <div class="sub-bar">
+        <button class="sub-btn blue" id="subQuota" onclick="submitEntries('quota')">Update Quotas</button>
+        <span class="cnt" id="cntQuota">0 cadets</span>
+      </div>
+    </div>
+
+    <!-- TEAM -->
+    <div class="sec-panel" id="panel-team">
+      <div class="sec-label">Team reason / activity</div>
+      <input class="r-inp" id="teamR" placeholder="e.g. PathFIT Sail 3rd Place…">
+      <div class="col-heads c-team"><div class="ch">Team #</div><div class="ch">All cadets in team</div><div class="ch">Points</div><div></div></div>
+      <div id="teamRows"></div>
+      <button class="add-btn" onclick="addRow('team')">+ Add team</button>
+      <div class="sub-bar">
+        <button class="sub-btn pur" id="subTeam" onclick="submitEntries('team')">Submit Team Award</button>
+        <span class="cnt" id="cntTeam">0 teams</span>
+      </div>
+    </div>
+
+    <div class="log-sec">
+      <div class="log-title">This session</div>
+      <div id="sessionLog"><div style="color:var(--tx3);font-size:13px">No submissions yet.</div></div>
+    </div>
+  </div>
+
+  <!-- ===================== CHECKER ===================== -->
+  <div class="sec-panel" id="sec-checker">
+    <div class="sec-label">Upload Excel file to check against database</div>
+    <div class="file-drop-zone" id="checkerDrop" onclick="document.getElementById('checkerInput').click()">
+      <div class="fdz-title">Drop Excel file here or click to browse</div>
+      <div class="fdz-sub">File must have a <strong>Name</strong> column · .xlsx or .xls</div>
+    </div>
+    <input type="file" id="checkerInput" accept=".xlsx,.xls" onchange="runChecker(this)">
+    <div class="checker-results" id="checkerResults">
+      <div class="cr-header">
+        <div class="cr-title" id="crTitle">Results</div>
+        <div class="cr-stats">
+          <div class="cr-stat found" id="crFound">0 matched</div>
+          <div class="cr-stat miss" id="crMiss">0 missing</div>
+          <button class="export-btn" onclick="exportMissing()">Export Missing</button>
+        </div>
+      </div>
+      <div class="cr-list" id="crList"></div>
+    </div>
+  </div>
+
+  <!-- ===================== MAT ===================== -->
+  <div class="sec-panel" id="sec-mat">
+    <div class="mat-header">
+      <div>
+        <div class="mat-loaded" id="matLoaded">Loading cadet data…</div>
+        <div style="font-size:11px;color:var(--tx3);margin-top:2px">Names are loaded from the database for autocomplete</div>
+      </div>
+    </div>
+    <div class="mat-form-grid">
+      <div>
+        <div class="sec-label">Sport</div>
+        <input type="text" id="matSport" placeholder="e.g. Football, Chess (Rapid)…">
+      </div>
+      <div>
+        <div class="sec-label">Date</div>
+        <input type="date" id="matDate">
+      </div>
+    </div>
+
+    <div class="mat-sides">
+      <!-- WIN SIDE -->
+      <div class="mat-side">
+        <div class="mat-side-title win">WIN</div>
+        <div class="mat-side-sub">Winning team players</div>
+        <div class="mat-team-row">
+          <div>
+            <div class="sec-label">Team</div>
+            <select id="winTeam">
+              <option value="">Select team…</option>
+              <option value="1">Team 1</option><option value="2">Team 2</option><option value="3">Team 3</option>
+              <option value="4">Team 4</option><option value="5">Team 5</option><option value="6">Team 6</option>
+              <option value="7">Team 7</option><option value="8">Team 8</option><option value="9">Team 9</option>
+            </select>
+          </div>
+          <div>
+            <div class="sec-label">Merit Per Player</div>
+            <input type="number" id="winMerit" min="0" placeholder="Points">
+          </div>
+        </div>
+        <div class="sec-label">Players</div>
+        <div class="mat-players" id="winPlayers"></div>
+      </div>
+      <!-- LOSS SIDE -->
+      <div class="mat-side">
+        <div class="mat-side-title loss">LOSS</div>
+        <div class="mat-side-sub">Losing team players</div>
+        <div class="mat-team-row">
+          <div>
+            <div class="sec-label">Team</div>
+            <select id="lossTeam">
+              <option value="">Select team…</option>
+              <option value="1">Team 1</option><option value="2">Team 2</option><option value="3">Team 3</option>
+              <option value="4">Team 4</option><option value="5">Team 5</option><option value="6">Team 6</option>
+              <option value="7">Team 7</option><option value="8">Team 8</option><option value="9">Team 9</option>
+            </select>
+          </div>
+          <div>
+            <div class="sec-label">Merit Per Player</div>
+            <input type="number" id="lossMerit" min="0" placeholder="Points">
+          </div>
+        </div>
+        <div class="sec-label">Players</div>
+        <div class="mat-players" id="lossPlayers"></div>
+      </div>
+    </div>
+
+    <button class="mat-submit-btn" id="matSubmitBtn" onclick="submitMAT()">
+      <svg class="send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Submit to Records
+    </button>
+
+    <div class="mat-records-section">
+      <div class="mat-rec-title">Record Management</div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:10px">Delete all MAT records for a specific date</div>
+      <div class="mat-del-row">
+        <input type="date" id="delDate" class="del-date-inp">
+        <button class="del-btn" onclick="deleteMatRecords()">Delete Records</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const db = getDB();
+let allNames = [];
+let operatorEmail = '';
+let sessionEntries = [];
+let currentMode = 'merit';
+let rc = {merit:0,availed:0,quota:0,team:0};
+let checkerMissingData = [];
+
+function toggleMenu() {
+  var drawer = document.getElementById('mdrawer');
+  var overlay = document.getElementById('moverlay');
+  if (drawer.classList.contains('on')) {
+    drawer.classList.remove('on');
+    overlay.classList.remove('on');
+    overlay.style.display = 'none';
+  } else {
+    drawer.classList.add('on');
+    overlay.classList.add('on');
+    overlay.style.display = 'block';
+  }
+}
+
+document.getElementById('moverlay').addEventListener('click', toggleMenu);
+
+document.addEventListener('click', function(e) {
+  var drawer = document.getElementById('mdrawer');
+  var overlay = document.getElementById('moverlay');
+  var mbtn = document.querySelector('.mbtn');
+  if (drawer.classList.contains('on') && !drawer.contains(e.target) && !mbtn.contains(e.target)) {
+    drawer.classList.remove('on');
+    overlay.classList.remove('on');
+    overlay.style.display = 'none';
+  }
+});
+
+// ============ BOOT ============
+async function boot() {
+  const { data:{ session }} = await db.auth.getSession();
+  if (!session) { showGate(false); return; }
+  const email = session.user.email.toLowerCase();
+  const [{ data: enc },{ data: adm }] = await Promise.all([
+    db.from('allowed_encoders').select('email').eq('email',email).maybeSingle(),
+    db.from('allowed_admins').select('email').eq('email',email).maybeSingle()
+  ]);
+  if (!enc && !adm) { showGate(true); return; }
+  operatorEmail = email;
+  document.getElementById('authGate').style.display='none';
+  document.getElementById('appContent').style.display='block';
+  document.getElementById('opEmail').textContent=email;
+  document.getElementById('userPill').style.display='flex';
+  document.getElementById('uAv').textContent=email[0].toUpperCase();
+  document.getElementById('uEmail').textContent=email.split('@')[0];
+  if (adm) { 
+    document.querySelectorAll('.menu-admin').forEach(function(el){el.style.display='flex';});
+  }
+  document.querySelectorAll('.menu-encode').forEach(function(el){el.style.display='flex';});
+  document.querySelectorAll('.menu-feedback').forEach(function(el){el.style.display='flex';});
+
+  const { data: names } = await db.from('cadets').select('name').order('name');
+  if (names) {
+    allNames = names.map(r=>r.name);
+    document.getElementById('matLoaded').textContent = `Data Index Loaded (${allNames.length} names).`;
+  }
+
+  initMeritRows(); initMAT();
+}
+function showGate(denied) {
+  document.getElementById('authGate').style.display='flex';
+  document.getElementById('appContent').style.display='none';
+  if (denied) document.getElementById('deniedMsg').style.display='block';
+}
+
+// ============ MAIN TABS ============
+function setMainTab(tab) {
+  ['merits','checker','mat'].forEach(id => {
+    document.getElementById('sec-'+id).classList.toggle('vis', id===tab);
+  });
+  document.querySelectorAll('.mt-btn').forEach((b,i) => {
+    b.classList.toggle('m-act', ['merits','checker','mat'][i]===tab);
+  });
+}
+
+// ============ MODE ============
+function setMode(m) {
+  currentMode = m;
+  ['merit','availed','quota','team'].forEach(id => {
+    document.getElementById('panel-'+id).classList.toggle('vis', id===m);
+  });
+  document.querySelectorAll('.mb-btn').forEach((b,i) => {
+    const modes=['merit','availed','quota','team'];
+    const cls=['am','av','qu','te'];
+    b.className='mb-btn '+cls[i]+(modes[i]===m?' active':'');
+  });
+}
+
+function initMeritRows() {
+  addRow('merit');addRow('merit');addRow('merit');
+  addRow('availed');addRow('availed');
+  addRow('quota');
+  addRow('team');
+}
+
+function pickChip(el,mode) {
+  el.closest('.chips').querySelectorAll('.chip:not(.dashed)').forEach(c=>{c.classList.remove('sel-ok','sel-bad');});
+  el.classList.add(mode==='merit'?'sel-ok':'sel-bad');
+  document.getElementById(mode==='merit'?'meritR':'availedR').value='';
+}
+function focusR(id){document.getElementById(id).focus();}
+function clearChips(mode){
+  document.getElementById(mode==='merit'?'meritChips':'availedChips').querySelectorAll('.chip').forEach(c=>c.classList.remove('sel-ok','sel-bad'));
+}
+function getReason(mode) {
+  if(mode==='merit'){const c=document.getElementById('meritR').value.trim();if(c)return c;const s=document.getElementById('meritChips').querySelector('.sel-ok');return s?s.textContent.trim():'';}
+  if(mode==='availed'){const c=document.getElementById('availedR').value.trim();if(c)return c;const s=document.getElementById('availedChips').querySelector('.sel-bad');return s?s.textContent.trim():'';}
+  if(mode==='team')return document.getElementById('teamR').value.trim();
+  return '';
+}
+
+// ============ ROWS ============
+function addRow(mode) {
+  rc[mode]++;
+  const id=`${mode}_${rc[mode]}`;
+  const div=document.createElement('div');
+  div.id=id;
+  if(mode==='merit'||mode==='availed'){
+    div.className='entry-row er3';
+    div.innerHTML=`<div class="name-wrap"><input type="text" placeholder="LAST, FIRST MI" oninput="onNameInput(this,'${id}')" autocomplete="off"><div class="name-drop" id="nd_${id}"></div></div><input type="number" min="0" placeholder="pts" oninput="countRows('${mode}')"><button class="rm-btn" onclick="removeRow('${id}','${mode}')">×</button>`;
+  } else if(mode==='quota'){
+    div.className='entry-row er4';
+    div.innerHTML=`<div class="name-wrap"><input type="text" placeholder="LAST, FIRST MI" oninput="onNameInput(this,'${id}')" autocomplete="off"><div class="name-drop" id="nd_${id}"></div></div><input type="number" min="0" placeholder="DR"><input type="number" min="0" placeholder="ED"><button class="rm-btn" onclick="removeRow('${id}','quota')">×</button>`;
+  } else if(mode==='team'){
+    div.className='entry-row er-team';
+    div.innerHTML=`<input type="number" min="1" max="20" placeholder="#" oninput="countRows('team')"><div style="padding:8px 10px;background:var(--sur2);border:1px solid var(--bor);border-radius:8px;font-size:12px;color:var(--tx3)">All cadets in this team</div><input type="number" min="0" placeholder="pts" oninput="countRows('team')"><button class="rm-btn" onclick="removeRow('${id}','team')">×</button>`;
+  }
+  document.getElementById(mode+'Rows').appendChild(div);
+  countRows(mode);
+  div.querySelector('input').focus();
+}
+
+function removeRow(id,mode){const el=document.getElementById(id);if(el)el.remove();countRows(mode);}
+function countRows(mode){const n=document.getElementById(mode+'Rows').children.length;const l=mode==='team'?'teams':'cadets';const key=mode.charAt(0).toUpperCase()+mode.slice(1);document.getElementById('cnt'+key).textContent=n+' '+l;}
+
+function onNameInput(input,rowId){
+  const mode=rowId.split('_')[0]; countRows(mode);
+  const val=input.value.trim().toUpperCase();
+  const drop=document.getElementById('nd_'+rowId);
+  drop.innerHTML='';
+  if(val.length<2){drop.style.display='none';return;}
+  const matches=allNames.filter(n=>n.toUpperCase().includes(val)).slice(0,5);
+  if(!matches.length){drop.style.display='none';return;}
+  matches.forEach(name=>{
+    const d=document.createElement('div');d.className='name-item';d.textContent=name;
+    d.onmousedown=e=>{e.preventDefault();input.value=name;drop.style.display='none';countRows(mode);};
+    drop.appendChild(d);
+  });
+  drop.style.display='block';
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.name-wrap'))document.querySelectorAll('.name-drop').forEach(d=>d.style.display='none');});
+
+// ============ SUBMIT MERITS ============
+async function submitEntries(mode) {
+  const reason = getReason(mode);
+  if(mode!=='quota'&&!reason){showToast('Pick or type a reason first.','warn');return;}
+  const rows=document.getElementById(mode+'Rows').children;
+  const entries=[];
+  for(const row of rows){
+    const inputs=row.querySelectorAll('input');
+    if(mode==='merit'||mode==='availed'){
+      const name=inputs[0].value.trim(); const pts=parseFloat(inputs[1].value);
+      if(!name&&!pts)continue;
+      if(!name){showToast('A row is missing a cadet name.','warn');return;}
+      if(!pts||pts<=0){showToast(`Invalid points for ${name}.`,'warn');return;}
+      const matched=allNames.find(n=>n.toUpperCase()===name.toUpperCase())||name;
+      if(mode==='merit')entries.push({cadet_name:matched,merit:pts,details:reason,availed:0,details_availed:null,operator:operatorEmail,entry_date:new Date().toISOString()});
+      else entries.push({cadet_name:matched,merit:0,details:null,availed:pts,details_availed:reason,operator:operatorEmail,entry_date:new Date().toISOString()});
+    } else if(mode==='quota'){
+      const name=inputs[0].value.trim();const dr=parseFloat(inputs[1].value)||0;const ed=parseFloat(inputs[2].value)||0;
+      if(!name)continue; entries.push({name,quota_dr:dr,quota_ed:ed});
+    } else if(mode==='team'){
+      const inputs2=row.querySelectorAll('input[type=number]');
+      const teamNum=parseInt(inputs2[0].value); const pts=parseFloat(inputs2[1].value);
+      if(!teamNum&&!pts)continue;
+      if(!teamNum){showToast('Enter a team number.','warn');return;}
+      if(!pts||pts<=0){showToast('Enter valid points.','warn');return;}
+      entries.push({teamNum,pts,reason});
+    }
+  }
+  if(!entries.length){showToast('No entries to submit.','warn');return;}
+  const btnId='sub'+mode.charAt(0).toUpperCase()+mode.slice(1);
+  const btn=document.getElementById(btnId);
+  btn.innerHTML='<span class="spin"></span> Saving…';btn.disabled=true;
+  let error=null;
+  if(mode==='merit'||mode==='availed'){
+    const r=await db.from('merit_entries').insert(entries);error=r.error;
+  } else if(mode==='quota'){
+    for(const e of entries){const r=await db.from('cadets').update({quota_dr:e.quota_dr,quota_ed:e.quota_ed}).ilike('name',e.name);if(r.error){error=r.error;break;}}
+  } else if(mode==='team'){
+    for(const e of entries){
+      const {data:tc,error:te}=await db.from('cadets').select('name').eq('team',e.teamNum);
+      if(te){error=te;break;}
+      if(!tc||!tc.length){showToast(`No cadets found in Team ${e.teamNum}.`,'warn');btn.innerHTML='Submit Team Award';btn.disabled=false;return;}
+      const rows=tc.map(c=>({cadet_name:c.name,merit:e.pts,details:e.reason,availed:0,details_availed:null,operator:operatorEmail,entry_date:new Date().toISOString()}));
+      const r=await db.from('merit_entries').insert(rows);
+      if(r.error){error=r.error;break;}
+    }
+  }
+  const labels={merit:'Submit Merit Entries',availed:'Submit Reductions',quota:'Update Quotas',team:'Submit Team Award'};
+  btn.textContent=labels[mode];btn.disabled=false;
+  if(error){showToast('Error: '+error.message,'bad');return;}
+  const n=mode==='team'?entries.reduce((a,e)=>a+(e.teamNum?1:0),0)+' team(s)':entries.length+' entr'+(entries.length===1?'y':'ies');
+  showToast(`${n} saved!`,'ok');
+  entries.forEach(e=>sessionEntries.unshift({mode,reason,e}));renderLog();clearMode(mode);
+}
+
+function clearMode(mode){
+  document.getElementById(mode+'Rows').innerHTML='';rc[mode]=0;
+  if(mode==='merit'||mode==='availed'){addRow(mode);addRow(mode);addRow(mode);}
+  else{addRow(mode);}
+}
+function renderLog(){
+  const el=document.getElementById('sessionLog');
+  if(!sessionEntries.length){el.innerHTML='<div style="color:var(--tx3);font-size:13px">No submissions yet.</div>';return;}
+  el.innerHTML=sessionEntries.slice(0,6).map(({mode,reason,e})=>{
+    const name=e.cadet_name||(e.teamNum?`Team ${e.teamNum}`:'—');
+    const pts=e.merit||e.pts||e.availed||0;
+    const isNeg=mode==='availed';
+    const col=mode==='quota'?'var(--acc)':isNeg?'var(--bad)':'var(--ok)';
+    const val=mode==='quota'?`DR:${e.quota_dr} ED:${e.quota_ed}`:(isNeg?'−':'+')+pts;
+    return `<div class="log-item"><div><div class="log-name">${name}</div><div class="log-det">${reason||'Quota update'}</div></div><div class="log-pts" style="color:${col}">${val}</div></div>`;
+  }).join('');
+}
+
+// ============ CHECKER ============
+const cdrop=document.getElementById('checkerDrop');
+cdrop.addEventListener('dragover',e=>{e.preventDefault();cdrop.style.borderColor='var(--acc)';});
+cdrop.addEventListener('dragleave',()=>{cdrop.style.borderColor='';});
+cdrop.addEventListener('drop',e=>{e.preventDefault();cdrop.style.borderColor='';const f=e.dataTransfer.files[0];if(f){const inp=document.getElementById('checkerInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;runChecker(inp);}});
+
+function normalizeNameForCheck(s){
+  if(!s)return '';
+  s=s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+  s=s.toUpperCase().replace(/[^A-Z0-9\s]/g,'');
+  s=s.replace(/\bJR\b|\bSR\b|\bIII\b|\bII\b/g,'').replace(/\s+/g,' ').trim();
+  return s;
+}
+
+function extractKeyParts(name){
+  const norm=normalizeNameForCheck(name);
+  if(norm.includes(',')){
+    const [last,rest]=norm.split(',',2);
+    const firstName=rest.trim().split(/\s+/)[0];
+    return {first:firstName?.trim(),last:last?.trim()};
+  }
+  const tokens=norm.split(/\s+/);
+  return {first:tokens[0],last:tokens[tokens.length-1]};
+}
+
+function namesMatch(uploadName,dbName){
+  const u=extractKeyParts(uploadName);
+  const d=extractKeyParts(dbName);
+  if(!u.first||!d.first||!u.last||!d.last)return false;
+  if(u.first===d.first&&u.last===d.last)return true;
+  if(u.first===d.first&&(u.last.includes(d.last)||d.last.includes(u.last)))return true;
+  return false;
+}
+
+async function runChecker(input){
+  const file=input.files[0];if(!file)return;
+  cdrop.innerHTML='<div class="fdz-title"><span class="spin" style="border-top-color:var(--acc)"></span> Analyzing…</div>';
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const wb=XLSX.read(e.target.result,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+    const uploadNames=rows.map(r=>(r['Name']||r['name']||r['NAME']||'').toString().trim()).filter(Boolean);
+    
+    checkerMissingData=[];
+    const results=[];
+    uploadNames.forEach(uName=>{
+      const found=allNames.some(dbName=>namesMatch(uName,dbName));
+      results.push({name:uName,found});
+      if(!found)checkerMissingData.push(uName);
+    });
+    
+    const missing=results.filter(r=>!r.found);
+    const matched=results.filter(r=>r.found);
+    
+    document.getElementById('crTitle').textContent=`Results for "${file.name}"`;
+    document.getElementById('crFound').textContent=`${matched.length} matched`;
+    document.getElementById('crMiss').textContent=`${missing.length} missing`;
+    const list=document.getElementById('crList');
+    list.innerHTML='';
+    missing.forEach(r=>{
+      const d=document.createElement('div');d.className='cr-item missing';
+      d.innerHTML=`<span>${r.name}</span><span class="cr-tag miss">NOT FOUND</span>`;
+      list.appendChild(d);
+    });
+    matched.slice(0,30).forEach(r=>{
+      const d=document.createElement('div');d.className='cr-item found';
+      d.innerHTML=`<span>${r.name}</span><span class="cr-tag ok">MATCHED</span>`;
+      list.appendChild(d);
+    });
+    if(matched.length>30){
+      const d=document.createElement('div');d.style.cssText='text-align:center;padding:8px;color:var(--tx3);font-size:12px';
+      d.textContent=`…and ${matched.length-30} more matched (not shown)`;
+      list.appendChild(d);
+    }
+    
+    document.getElementById('checkerResults').style.display='block';
+    cdrop.innerHTML='<div class="fdz-title">Drop another file or click to browse</div><div class="fdz-sub">File must have a <strong>Name</strong> column · .xlsx or .xls</div>';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function exportMissing(){
+  if(!checkerMissingData.length){showToast('No missing names to export.','warn');return;}
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.json_to_sheet(checkerMissingData.map(n=>({'Missing Names':n})));
+  XLSX.utils.book_append_sheet(wb,ws,'Missing');
+  XLSX.writeFile(wb,'missing_cadets.xlsx');
+}
+
+// ============ MAT ============
+function initMAT(){
+  const today=new Date();
+  document.getElementById('matDate').value=today.toISOString().split('T')[0];
+  buildMatPlayers('winPlayers',25);
+  buildMatPlayers('lossPlayers',25);
+}
+
+function buildMatPlayers(containerId, count){
+  const container=document.getElementById(containerId);
+  container.innerHTML='';
+  for(let i=1;i<=count;i++){
+    const side=containerId==='winPlayers'?'win':'loss';
+    const div=document.createElement('div');
+    div.className='name-wrap';div.style.marginBottom='4px';
+    div.innerHTML=`<input type="text" placeholder="Player ${i} Name" oninput="onMatNameInput(this,'${side}_p${i}')" autocomplete="off" data-side="${side}" data-idx="${i}"><div class="name-drop" id="nd_${side}_p${i}"></div>`;
+    container.appendChild(div);
+  }
+}
+
+function onMatNameInput(input, dropId){
+  const val=input.value.trim().toUpperCase();
+  const drop=document.getElementById('nd_'+dropId);
+  drop.innerHTML='';
+  if(val.length<2){drop.style.display='none';return;}
+  const matches=allNames.filter(n=>n.toUpperCase().includes(val)).slice(0,5);
+  if(!matches.length){drop.style.display='none';return;}
+  matches.forEach(name=>{
+    const d=document.createElement('div');d.className='name-item';d.textContent=name;
+    d.onmousedown=e=>{e.preventDefault();input.value=name;drop.style.display='none';};
+    drop.appendChild(d);
+  });
+  drop.style.display='block';
+}
+
+async function submitMAT(){
+  const sport=document.getElementById('matSport').value.trim();
+  const date=document.getElementById('matDate').value;
+  const winTeam=document.getElementById('winTeam').value;
+  const losTeam=document.getElementById('lossTeam').value;
+  const winMerit=parseFloat(document.getElementById('winMerit').value)||0;
+  const losMerit=parseFloat(document.getElementById('lossMerit').value)||0;
+
+  if(!sport){showToast('Enter a sport name.','warn');return;}
+  if(!date){showToast('Select a date.','warn');return;}
+
+  const winPlayers=[...document.getElementById('winPlayers').querySelectorAll('input[type=text]')].map(i=>i.value.trim()).filter(Boolean);
+  const lossPlayers=[...document.getElementById('lossPlayers').querySelectorAll('input[type=text]')].map(i=>i.value.trim()).filter(Boolean);
+
+  if(!winPlayers.length&&!lossPlayers.length){showToast('Enter at least one player.','warn');return;}
+
+  const btn=document.getElementById('matSubmitBtn');
+  btn.innerHTML='<span class="spin"></span> Saving…';btn.disabled=true;
+
+  const entries=[];
+  const ts=new Date().toISOString();
+  winPlayers.forEach(name=>{
+    entries.push({record_date:date,sport,result:'WIN',team_number:parseInt(winTeam)||null,player_name:name,merit:winMerit,operator:operatorEmail});
+    if(winMerit>0){
+      entries.push({_merit_entry:true,cadet_name:name,merit:winMerit,details:`MAT - ${sport} (WIN)`,availed:0,details_availed:null,operator:operatorEmail,entry_date:ts});
+    }
+  });
+  lossPlayers.forEach(name=>{
+    entries.push({record_date:date,sport,result:'LOSS',team_number:parseInt(losTeam)||null,player_name:name,merit:losMerit,operator:operatorEmail});
+    if(losMerit>0){
+      entries.push({_merit_entry:true,cadet_name:name,merit:losMerit,details:`MAT - ${sport} (LOSS)`,availed:0,details_availed:null,operator:operatorEmail,entry_date:ts});
+    }
+  });
+
+  const matRows=entries.filter(e=>!e._merit_entry).map(({record_date,sport,result,team_number,player_name,merit,operator})=>({record_date,sport,result,team_number,player_name,merit,operator}));
+  const meritRows=entries.filter(e=>e._merit_entry).map(({cadet_name,merit,details,availed,details_availed,operator,entry_date})=>({cadet_name,merit,details,availed,details_availed,operator,entry_date}));
+
+  let error=null;
+  if(matRows.length){const r=await db.from('mat_records').insert(matRows);if(r.error)error=r.error;}
+  if(!error&&meritRows.length){const r=await db.from('merit_entries').insert(meritRows);if(r.error)error=r.error;}
+
+  btn.innerHTML='<svg class="send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Submit to Records';
+  btn.disabled=false;
+
+  if(error){showToast('Error: '+error.message,'bad');return;}
+
+  const total=winPlayers.length+lossPlayers.length;
+  showToast(`${total} player${total===1?'':'s'} recorded for ${sport}!`,'ok');
+  document.getElementById('winPlayers').querySelectorAll('input').forEach(i=>i.value='');
+  document.getElementById('lossPlayers').querySelectorAll('input').forEach(i=>i.value='');
+  document.getElementById('winMerit').value='';
+  document.getElementById('lossMerit').value='';
+  document.getElementById('matSport').value='';
+}
+
+async function deleteMatRecords(){
+  const date=document.getElementById('delDate').value;
+  if(!date){showToast('Select a date to delete.','warn');return;}
+  if(!confirm(`Delete all MAT records for ${date}?`))return;
+  const {error}=await db.from('mat_records').delete().eq('record_date',date);
+  if(error){showToast('Error: '+error.message,'bad');return;}
+  showToast('Records deleted.','ok');
+  document.getElementById('delDate').value='';
+}
+
+// ============ TOAST ============
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  const c={ok:'#22c55e',bad:'#ef4444',warn:'#f59e0b'};
+  t.textContent=msg;t.style.background=c[type]||c.ok;t.style.display='block';
+  setTimeout(()=>{t.style.display='none';},3200);
+}
+
+boot();
+</script>
+</body>
+</html>

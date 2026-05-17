@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleet Merit System · HR Department</title>
+<link rel="icon" type="image/png" href="logo.png?v=2">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#5b8dee">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+:root{
+  --bg:#06060d;
+  --bg2:#0d0d18;
+  --sur:#111120;
+  --sur2:#181828;
+  --bor:rgba(255,255,255,0.06);
+  --bor2:rgba(255,255,255,0.12);
+  --acc:#5b8dee;
+  --acc2:#7c5cfc;
+  --acc3:#38bdf8;
+  --tx:#eeeef5;
+  --tx2:#9999b0;
+  --tx3:#5a5a72;
+  --ok:#34d399;
+  --warn:#fbbf24;
+  --bad:#f87171;
+  --gold:#f5c842;
+  --pur:#8b5cf6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+
+/* PRELOADER */
+#preloader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s}
+#preloader.fade-out{opacity:0;pointer-events:none}
+.preloader-logo-wrap{display:grid;place-items:center;width:170px;height:170px;margin:0 auto 8px}
+.preloader-logo{grid-area:1/1;width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(91,141,238,0.5));animation:logoPulse 1.5s ease-in-out infinite}
+.preloader-ring{grid-area:1/1;width:140px;height:140px;border:2px solid rgba(91,141,238,0.2);border-radius:50%;animation:ringSpin 2s linear infinite}
+.preloader-ring2{grid-area:1/1;width:170px;height:170px;border:2px dashed rgba(139,92,246,0.15);border-radius:50%;animation:ringSpin 3s linear infinite reverse}
+@keyframes logoPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes ringSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.preloader-text{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--tx2);margin-top:20px;letter-spacing:2px}
+
+/* KINETIC GRID BACKGROUND */
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(91,141,238,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(91,141,238,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  animation:gridMove 20s linear infinite}
+@keyframes gridMove{0%{transform:translate(0,0)}100%{transform:translate(60px,60px)}}
+
+.bg-glow{position:fixed;top:-30%;left:20%;width:80vw;height:80vw;border-radius:50%;
+  background:radial-gradient(circle,rgba(91,141,238,0.08) 0%,transparent 60%);
+  pointer-events:none;z-index:0;animation:glowFloat 15s ease-in-out infinite}
+.bg-glow2{position:fixed;bottom:-20%;right:-10%;width:50vw;height:50vw;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,0.06) 0%,transparent 60%);
+  pointer-events:none;z-index:0;animation:glowFloat 18s ease-in-out infinite 3s}
+.bg-glow3{position:fixed;top:40%;left:-10%;width:30vw;height:30vw;border-radius:50%;
+  background:radial-gradient(circle,rgba(56,189,248,0.04) 0%,transparent 60%);
+  pointer-events:none;z-index:0;animation:glowFloat 12s ease-in-out infinite 5s}
+@keyframes glowFloat{0%,100%{opacity:0.5;transform:translate(0,0) scale(1)}50%{opacity:0.8;transform:translate(30px,-30px) scale(1.1)}}
+
+/* Floating particles */
+.particle{position:fixed;width:4px;height:4px;background:var(--acc);border-radius:50%;opacity:0.3;pointer-events:none;z-index:0;animation:particleFloat 15s infinite}
+.particle:nth-child(2){left:20%;top:30%;animation-delay:-2s;width:6px;height:6px;background:var(--acc2)}
+.particle:nth-child(3){left:60%;top:60%;animation-delay:-4s;width:3px;height:3px;background:var(--acc3)}
+.particle:nth-child(4){left:80%;top:20%;animation-delay:-6s;width:5px;height:5px;background:var(--pur)}
+.particle:nth-child(5){left:40%;top:80%;animation-delay:-8s;width:4px;height:4px;background:var(--ok)}
+@keyframes particleFloat{0%,100%{transform:translateY(0) rotate(0deg);opacity:0.3}50%{transform:translateY(-100px) rotate(180deg);opacity:0.6}}
+
+.page{position:relative;z-index:1}
+
+/* NAV */
+nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 32px;border-bottom:1px solid var(--bor);
+  backdrop-filter:blur(20px);background:rgba(6,6,13,0.85);
+  position:sticky;top:0;z-index:200
+}
+.nav-brand{display:flex;align-items:center;gap:12px}
+.nav-logo-img{width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(91,141,238,0.4))}
+.nav-name{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:-.4px}
+.nav-name span{color:var(--acc)}
+.nav-links{display:none!important}
+.nb{padding:7px 15px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;border:1px solid var(--bor);background:transparent;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif}
+.nb:hover{border-color:var(--acc);color:var(--acc);background:rgba(91,141,238,0.07)}
+.nb.act{background:var(--acc);color:#fff;border-color:var(--acc)}
+.nb.adm{background:rgba(124,92,256,0.12);border-color:rgba(124,92,256,0.28);color:#a78bfa;display:none}
+.nb.adm.show{display:inline-flex}
+.user-pill{display:flex;align-items:center;gap:7px;padding:5px 12px 5px 6px;border-radius:100px;background:var(--sur);border:1px solid var(--bor2);font-size:12px;color:var(--tx2)}
+.u-av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.u-sign{cursor:pointer;color:var(--bad);margin-left:2px;font-size:14px;transition:opacity .2s}
+.u-sign:hover{opacity:.7}
+.mbtn{width:40px;height:40px;border-radius:8px;border:1px solid #fff;background:#5b8dee;cursor:pointer;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;margin-left:8px}
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:150;display:none}
+.moverlay.on{display:block}
+.mdrawer{position:fixed;top:0;right:0;width:280px;height:100vh;background:#111120;border-left:1px solid rgba(255,255,255,0.12);z-index:160;padding:0;transform:translateX(100%);transition:transform .3s}
+.mdrawer.on{transform:translateX(0)}
+.mhdr{padding:18px 20px;border-bottom:1px solid var(--bor);display:flex;justify-content:space-between;align-items:center}
+.mc{padding:10px 0}
+.mi{display:flex;align-items:center;padding:14px 20px;font-size:14px;font-weight:500;color:var(--tx2);text-decoration:none;border-left:3px solid transparent;transition:all .2s}
+.mi:hover{border-color:var(--pur);color:var(--tx);background:rgba(124,92,246,0.06)}
+.mi.act{border-color:var(--pur);color:var(--pur);background:rgba(124,92,246,0.08)}
+.mi.adm{display:none}
+.mi.adm.on{display:flex}
+.mi.menu-logout{display:none;color:var(--bad)}
+.mi.menu-logout:hover{border-color:var(--bad);color:var(--bad);background:rgba(248,113,113,0.06)}
+
+/* HERO */
+.hero{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:72px 24px 56px;position:relative
+}
+.hero-logo-wrap{position:relative;margin-bottom:28px}
+.hero-logo{width:140px;height:140px;object-fit:contain;
+  filter:drop-shadow(0 0 24px rgba(91,141,238,0.35)) drop-shadow(0 0 60px rgba(91,141,238,0.15)) brightness(1.1)}
+.hero-logo-ring{position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(91,141,238,0.2);animation:spin 20s linear infinite}
+.hero-logo-ring2{position:absolute;inset:-28px;border-radius:50%;border:1px dashed rgba(124,92,256,0.12);animation:spin 30s linear infinite reverse}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(30px,5vw,52px);font-weight:800;letter-spacing:-2px;line-height:1.04;margin-bottom:12px}
+.hero h1 .grad{background:linear-gradient(135deg,var(--acc) 0%,var(--acc2) 50%,var(--acc3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{color:var(--tx2);font-size:15px;font-weight:300;max-width:420px;line-height:1.6;margin-bottom:20px}
+.sched-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(124,92,256,0.09);border:1px solid rgba(124,92,256,0.22);border-radius:100px;padding:6px 16px;font-size:12px;color:#a78bfa;font-weight:500}
+.sched-dot{width:5px;height:5px;border-radius:50%;background:#a78bfa}
+
+/* SEARCH CARD */
+.search-wrap{max-width:520px;margin:0 auto;padding:0 20px 64px;width:100%}
+.sc{background:var(--sur);border:1px solid var(--bor2);border-radius:18px;padding:26px;box-shadow:0 0 40px rgba(0,0,0,0.3)}
+.sl{font-size:11px;font-weight:600;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px}
+.sr{display:flex;gap:8px;position:relative}
+.si{flex:1;background:var(--sur2);border:1px solid var(--bor);border-radius:10px;padding:13px 15px;font-size:14px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;transition:all .2s}
+.si:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(91,141,238,0.12)}
+.si::placeholder{color:var(--tx3)}
+.sbtn{background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;border-radius:10px;padding:13px 22px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s;box-shadow:0 4px 14px rgba(91,141,238,0.3)}
+.sbtn:hover{opacity:.88;transform:translateY(-1px)}
+.sbtn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.sugbox{position:absolute;top:calc(100% + 5px);left:0;right:68px;background:var(--sur2);border:1px solid var(--bor2);border-radius:10px;z-index:50;overflow:hidden;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.sug-item{padding:10px 14px;font-size:13px;cursor:pointer;color:var(--tx);transition:background .15s;border-bottom:1px solid var(--bor)}
+.sug-item:last-child{border-bottom:none}
+.sug-item:hover{background:rgba(91,141,238,0.1);color:var(--acc)}
+
+/* RESULT */
+.rc{margin-top:16px;border-radius:14px;overflow:hidden;display:none;animation:slideUp .3s ease;border:1px solid var(--bor2)}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.rh{padding:18px 22px;background:linear-gradient(135deg,rgba(91,141,238,0.08),rgba(124,92,252,0.06));border-bottom:1px solid var(--bor);display:flex;justify-content:space-between;align-items:flex-start}
+.rn{font-family:'Syne',sans-serif;font-size:17px;font-weight:700}
+.rt{font-size:12px;color:var(--tx2);margin-top:3px}
+.mb{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;background:linear-gradient(135deg,var(--gold),#f0a500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.ml{font-size:11px;color:var(--tx2);text-align:right;margin-top:2px}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bor)}
+.sb{background:var(--sur);padding:13px 18px}
+.sbl{font-size:10px;color:var(--tx3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em}
+.sbv{font-size:19px;font-weight:600;font-family:'Syne',sans-serif}
+.as{padding:14px 20px 18px;background:var(--sur)}
+.atog{display:flex;gap:5px;margin-bottom:12px}
+.ap{padding:5px 14px;border-radius:100px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--bor);background:transparent;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif}
+.ap.act{background:var(--acc);border-color:var(--acc);color:#fff}
+.al{display:flex;flex-direction:column;gap:1px}
+.ar{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:7px;transition:background .15s}
+.ar:hover{background:rgba(255,255,255,0.03)}
+.an{font-size:13px;color:var(--tx);flex:1}
+.apts{font-size:13px;font-weight:600;font-family:'Syne',sans-serif}
+.pos{color:var(--ok)}.neg{color:var(--bad)}
+.es{text-align:center;padding:20px;color:var(--tx2);font-size:13px}
+
+/* STATS */
+.site-stats{max-width:520px;margin:0 auto 48px;padding:0 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat-card{background:var(--sur);border:1px solid var(--bor);border-radius:14px;padding:16px;text-align:center;transition:border-color .2s}
+.stat-card:hover{border-color:var(--bor2)}
+.stat-n{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-l{font-size:11px;color:var(--tx3);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+
+/* FOOTER */
+footer{text-align:center;padding:24px;color:var(--tx3);font-size:12px;border-top:1px solid var(--bor);display:flex;align-items:center;justify-content:center;gap:16px}
+footer img{width:24px;height:24px;object-fit:contain;opacity:.4;filter:invert(1)}
+footer a{color:var(--acc);text-decoration:none}
+footer a:hover{text-decoration:underline}
+
+/* SPINNER */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="preloader-logo-wrap">
+    <div class="preloader-ring"></div>
+    <div class="preloader-ring2"></div>
+    <img src="logo.png?v=2" class="preloader-logo" alt="Loading" onerror="this.style.display='none'">
+  </div>
+  <div class="preloader-text">LOADING</div>
+</div>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="bg-glow2"></div>
+<div class="bg-glow3"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="particle"></div>
+<div class="page">
+
+<nav>
+  <div class="nav-brand">
+    <img src="logo.png?v=2" class="nav-logo-img" alt="HR Logo" onerror="this.style.display='none'">
+    <div class="nav-name">Fleet <span>Merits</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="index.html" class="nb act">Lookup</a>
+    <a href="pages/about.html" class="nb">About</a>
+    <a href="pages/encode.html" class="nb">Encode</a>
+    <a href="pages/admin.html" class="nb adm" id="adminBtn">Admin</a>
+    <div class="user-pill" id="userPill" style="display:none">
+      <div class="u-av" id="uAv">?</div>
+      <span id="uEmail">—</span>
+      <span class="u-sign" onclick="signOut()" title="Sign out">×</span>
+    </div>
+  </div>
+  <button class="mbtn" onclick="toggleMenu()">
+    <span style="display:block;width:20px;height:3px;background:#fff;border-radius:2px"></span>
+    <span style="display:block;width:20px;height:3px;background:#fff;border-radius:2px"></span>
+    <span style="display:block;width:20px;height:3px;background:#fff;border-radius:2px"></span>
+  </button>
+</nav>
+<div class="moverlay" id="moverlay"></div>
+<div class="mdrawer" id="mdrawer">
+  <div class="mhdr">
+    <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px">Menu</span>
+    <button onclick="toggleMenu()" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:20px">×</button>
+  </div>
+  <div class="mc">
+    <a href="index.html" class="mi menu-lookup">🔍 Lookup</a>
+    <a href="pages/about.html" class="mi menu-about">📜 About</a>
+    <a href="pages/encode.html" class="mi menu-encode">✏️ Encode</a>
+    <a href="pages/admin.html" class="mi menu-admin">⚙️ Admin</a>
+    <a href="pages/feedback.html" class="mi menu-feedback">💬 Feedback</a>
+    <a href="#" class="mi menu-login" id="menuLoginBtn" onclick="signInWithGoogle()">Sign In</a>
+    <a href="#" class="mi menu-logout" id="menuLogoutBtn" onclick="signOut()" style="display:none">Logout</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-logo-wrap">
+    <div class="hero-logo-ring"></div>
+    <div class="hero-logo-ring2"></div>
+    <img src="logo.png?v=2" class="hero-logo" alt="HR Dept" onerror="this.style.display='none'">
+  </div>
+  <div class="live-badge"><div class="live-dot"></div>Live System</div>
+  <h1>Cadet <span class="grad">Merit</span> Lookup</h1>
+  <p class="hero-sub">Search any cadet's merit points, activity history, and quota balances — updated in real time.</p>
+  <div class="sched-pill"><div class="sched-dot"></div>HR Merit Store · Tue &amp; Thu · 1830H–1900H</div>
+</div>
+
+<div class="search-wrap">
+  <div class="sc">
+    <div class="sl">Search Cadet</div>
+    <div class="sr">
+      <input type="text" class="si" id="searchInput" placeholder="Type a name to search…" autocomplete="off">
+      <button class="sbtn" id="searchBtn">Search</button>
+      <div class="sugbox" id="sugBox"></div>
+    </div>
+    <div class="rc" id="resultCard">
+      <div class="rh">
+        <div><div class="rn" id="rName">—</div><div class="rt" id="rTeam">—</div></div>
+        <div><div class="mb" id="rMerit">—</div><div class="ml">Net Merit Points</div></div>
+      </div>
+      <div class="sgrid">
+        <div class="sb"><div class="sbl">Total Earned</div><div class="sbv" id="rEarned">—</div></div>
+        <div class="sb"><div class="sbl">Total Availed</div><div class="sbv" id="rAvailed">—</div></div>
+        <div class="sb"><div class="sbl">Quota DR</div><div class="sbv" id="rQDR">—</div></div>
+        <div class="sb"><div class="sbl">Quota ED</div><div class="sbv" id="rQED">—</div></div>
+      </div>
+      <div class="as">
+        <div class="atog">
+          <button class="ap act" id="pAct" onclick="switchTab('activity')">Recent Activity</button>
+          <button class="ap" id="pRed" onclick="switchTab('reduction')">Reductions</button>
+        </div>
+        <div class="al" id="actList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="site-stats">
+  <div class="stat-card"><div class="stat-n" id="stC">—</div><div class="stat-l">Cadets</div></div>
+  <div class="stat-card"><div class="stat-n" id="stE">—</div><div class="stat-l">Entries</div></div>
+  <div class="stat-card"><div class="stat-n" id="stO">—</div><div class="stat-l">Operators</div></div>
+</div>
+
+
+<!-- Non-intrusive footer ad (only shows when enabled) -->
+<div id="adContainer" style="display:none;max-width:728px;margin:0 auto 16px;padding:0 20px;text-align:center">
+  <ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-7890018515898652"
+    data-ad-slot="auto"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+<footer>
+  <img src="logo.png?v=2" alt="HR">
+  <span>Merit System © 2025 · Human Resource Department</span>
+  <a href="pages/feedback.html">Send Feedback</a>
+</footer>
+</div>
+
+<script>
+function toggleMenu() {
+  var drawer = document.getElementById('mdrawer');
+  var overlay = document.getElementById('moverlay');
+  if (drawer.classList.contains('on')) {
+    drawer.classList.remove('on');
+    overlay.classList.remove('on');
+    overlay.style.display = 'none';
+  } else {
+    drawer.classList.add('on');
+    overlay.classList.add('on');
+    overlay.style.display = 'block';
+  }
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+  var drawer = document.getElementById('mdrawer');
+  var overlay = document.getElementById('moverlay');
+  var mbtn = document.querySelector('.mbtn');
+  if (drawer.classList.contains('on') && !drawer.contains(e.target) && !mbtn.contains(e.target)) {
+    drawer.classList.remove('on');
+    overlay.classList.remove('on');
+    overlay.style.display = 'none';
+  }
+});
+
+// Search functionality
+var sugTimeout = null;
+document.getElementById('searchInput').addEventListener('input', function(){
+  clearTimeout(sugTimeout);
+  sugTimeout = setTimeout(showSuggestions, 200);
+});
+
+function showSuggestions() {
+  var inp = document.getElementById('searchInput').value.toLowerCase();
+  var box = document.getElementById('sugBox');
+  if (!inp || !allNames.length) { box.style.display='none'; return; }
+  var matches = allNames.filter(n => n.toLowerCase().includes(inp)).slice(0,6);
+  if (!matches.length) { box.style.display='none'; return; }
+  box.innerHTML = matches.map(n => '<div class="sug-item" onclick="selectName(\''+n.replace(/'/g,"\\'")+'\')">'+n+'</div>').join('');
+  box.style.display = 'block';
+}
+
+function selectName(name) {
+  document.getElementById('searchInput').value = name;
+  document.getElementById('sugBox').style.display='none';
+  searchCadet(name);
+}
+
+document.getElementById('searchBtn').addEventListener('click', function(){
+  var name = document.getElementById('searchInput').value.trim();
+  if (name) searchCadet(name);
+});
+
+document.getElementById('searchInput').addEventListener('keypress', function(e){
+  if (e.key === 'Enter') {
+    var name = this.value.trim();
+    if (name) searchCadet(name);
+  }
+});
+
+async function searchCadet(name) {
+  currentCadet = { name: name };
+  var res = await db.from('merit_entries').select('merit,availed').ilike('cadet_name', name);
+  var data = res.data || [];
+  var earned = data.reduce((s,r) => s + (r.merit||0), 0);
+  var availed = data.reduce((s,r) => s + (r.availed||0), 0);
+  var net = earned - availed;
+  var cRes = await db.from('cadets').select('team,batch,quota_dr,quota_ed').ilike('name', name).single();
+  var cadet = cRes.data || {};
+  document.getElementById('rName').textContent = name;
+  document.getElementById('rTeam').textContent = (cadet.team||'') + ' ' + (cadet.batch||'');
+  document.getElementById('rMerit').textContent = net;
+  document.getElementById('rEarned').textContent = earned;
+  document.getElementById('rAvailed').textContent = availed;
+  document.getElementById('rQDR').textContent = cadet.quota_dr||0;
+  document.getElementById('rQED').textContent = cadet.quota_ed||0;
+  document.getElementById('resultCard').style.display = 'block';
+  switchTab('activity');
+}
+
+const db = getDB();
+let allNames = [], currentCadet = null;
+
+async function init() {
+  // First set menu for guest (default)
+  document.querySelectorAll('.menu-encode, .menu-admin, .menu-feedback').forEach(el=>el.style.display='none');
+  document.querySelectorAll('.menu-about')[0]?.classList.add('act');
+  var mlookups = document.querySelectorAll('.menu-lookup');
+  if (mlookups[0]) { mlookups[0].style.display = 'none'; }
+  document.getElementById('menuLoginBtn').textContent='Sign In';
+
+  try {
+    const {session,isAdmin,isEncoder}=await initAuth();
+    if (session) {
+      document.getElementById('userPill').style.display='flex';
+      document.getElementById('uEmail').textContent = session.user.email.split('@')[0];
+      document.getElementById('uAv').textContent = session.user.email[0].toUpperCase();
+    }
+    // Show/hide menu items based on role
+    document.querySelectorAll('.menu-lookup')[0]?.classList.add('act');
+    if(isAdmin || isEncoder){
+      document.getElementById('menuLoginBtn').style.display='none';
+      document.getElementById('menuLogoutBtn').style.display='flex';
+    }
+    if(isAdmin){
+      document.querySelectorAll('.menu-admin').forEach(el=>el.style.display='flex');
+      document.querySelectorAll('.menu-encode').forEach(el=>el.style.display='flex');
+      document.querySelectorAll('.menu-feedback').forEach(el=>el.style.display='flex');
+    } else if(isEncoder){
+      document.querySelectorAll('.menu-encode').forEach(el=>el.style.display='flex');
+      document.querySelectorAll('.menu-feedback').forEach(el=>el.style.display='flex');
+      document.querySelectorAll('.menu-lookup')[0]?.classList.remove('act');
+    }
+    const { data: names } = await db.from('cadets').select('name').order('name');
+    if (names) allNames = names.map(r => r.name);
+    const [{ count: cc },{ count: ec },{ data: ops }] = await Promise.all([
+      db.from('cadets').select('*',{count:'exact',head:true}),
+      db.from('merit_entries').select('*',{count:'exact',head:true}),
+      db.from('merit_entries').select('operator')
+    ]);
+    document.getElementById('stC').textContent = cc??'—';
+  document.getElementById('stE').textContent = ec??'—';
+    if (ops) document.getElementById('stO').textContent = new Set(ops.map(r=>r.operator)).size;
+  } catch(e) {}
+}
+
+async function switchTab(tab){
+  document.getElementById('pAct').classList.toggle('act',tab==='activity');
+  document.getElementById('pRed').classList.toggle('act',tab==='reduction');
+  if(!currentCadet)return;
+  var list=document.getElementById('actList');
+  list.innerHTML='<div class="es">Loading…</div>';
+  // Load hidden entry IDs from localStorage (set by admin panel)
+  var hiddenIds=new Set();
+  try{var _s=localStorage.getItem('fleet_hidden_v1');if(_s)hiddenIds=new Set(JSON.parse(_s));}catch(ex){}
+  // Fetch entries including id so we can check against hidden list
+  var res=await db.from('merit_entries')
+    .select('id,details,merit,availed,details_availed,entry_date')
+    .ilike('cadet_name',currentCadet.name)
+    .order('entry_date',{ascending:false})
+    .limit(50);
+  var data=res.data;
+  list.innerHTML='';
+  if(!data||!data.length){list.innerHTML='<div class="es">No records found.</div>';return;}
+  var count=0;
+  data.forEach(function(row){
+    // Skip hidden entries in the DISPLAY only — points still count in the total above
+    if(hiddenIds.has(row.id))return;
+    var isR=tab==='reduction';
+    var label=isR?(row.details_availed||'-'):(row.details||'-');
+    var pts=isR?(row.availed!=null?row.availed:0):(row.merit!=null?row.merit:0);
+    if(isR&&!row.availed)return;
+    if(!isR&&!row.merit)return;
+    if(count>=10)return;
+    count++;
+    var d=document.createElement('div');d.className='ar';
+    var sign=isR?'-':(pts>=0?'+':'');
+    d.innerHTML='<span class="an">'+label+'</span>'+'<span class="apts '+(isR?'neg':(pts>=0?'pos':'neg'))+'">'+sign+pts+'</span>';
+    list.appendChild(d);
+  });
+  if(!list.children.length)list.innerHTML='<div class="es">No records.</div>';
+}
+
+// Setup overlay click to close
+document.getElementById('moverlay').addEventListener('click', toggleMenu);
+
+init();
+
+// Hide preloader after everything loads
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    var preloader = document.getElementById('preloader');
+    if(preloader){
+      preloader.classList.add('fade-out');
+      setTimeout(function(){preloader.style.display='none';},500);
+    }
+  }, 800);
+});
+</script>
+
+<!-- AdSense — loaded only when ads enabled in admin -->
+<script>
+(async function(){
+  const db2 = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const {data} = await db2.from('site_settings').select('value').eq('key','ads_enabled').single();
+  if(data?.value === 'true'){
+    // Add AdSense script
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7890018515898652';
+    s.crossOrigin = 'anonymous';
+    document.head.appendChild(s);
+    // Show ad container
+    document.getElementById('adContainer').style.display = 'block';
+  }
+})();
+</script>
+<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});</script>
+</body>
+</html>

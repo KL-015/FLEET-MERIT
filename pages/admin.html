@@ -1,0 +1,2513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Fleet Merits</title>
+<link rel="icon" type="image/png" href="../logo.png?v=2">
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#5b8dee">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/auth.js"></script>
+<style>
+:root{--bg:#06060d;--sur:#111120;--sur2:#181828;--bor:rgba(255,255,255,0.06);--bor2:rgba(255,255,255,0.12);--acc:#5b8dee;--acc2:#7c5cfc;--tx:#eeeef5;--tx2:#9999b0;--tx3:#5a5a72;--ok:#34d399;--bad:#f87171;--warn:#fbbf24;--pur:#8b5cf6;--teal:#22d3ee;--gold:#f5c842}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(91,141,238,0.04)1px,transparent 1px),linear-gradient(90deg,rgba(91,141,238,0.04)1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+.pg{position:relative;z-index:1}
+nav{display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--bor);backdrop-filter:blur(20px);position:sticky;top:0;z-index:200;background:rgba(6,6,13,0.88)}
+.nb{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;border:1px solid var(--bor);background:transparent;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif}
+.nb:hover{border-color:var(--acc);color:var(--acc)}
+.nb.act{background:var(--pur);color:#fff;border-color:var(--pur)}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:16px}
+.brand img{width:30px;height:30px;object-fit:contain}
+.brand span{color:var(--pur)}
+.upill{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 6px;border-radius:100px;background:var(--sur);border:1px solid var(--bor2);font-size:12px;color:var(--tx2)}
+.uav{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--pur),#6d28d9);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.mbtn{width:40px;height:40px;border-radius:8px;border:1px solid #fff;background:#7c5cfc;cursor:pointer;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;margin-left:8px}
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:150;display:none}
+.moverlay.on{display:block}
+.mdrawer{position:fixed;top:0;right:0;width:280px;height:100vh;background:#111120;border-left:1px solid rgba(255,255,255,0.12);z-index:160;padding:0;transform:translateX(100%);transition:transform .3s}
+.mdrawer.on{transform:translateX(0)}
+.mhdr{padding:18px 20px;border-bottom:1px solid var(--bor);display:flex;justify-content:space-between;align-items:center}
+.mc{padding:10px 0}
+.mi{display:flex;align-items:center;padding:14px 20px;font-size:14px;font-weight:500;color:var(--tx2);text-decoration:none;border-left:3px solid transparent;transition:all .2s}
+.mi:hover{border-color:var(--pur);color:var(--tx);background:rgba(124,92,246,0.06)}
+.mi.act{border-color:var(--pur);color:var(--pur);background:rgba(124,92,246,0.08)}
+#navLinks{display:none!important}
+
+#ag{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 68px);gap:14px;padding:32px}
+.gc{background:var(--sur);border:1px solid var(--bor2);border-radius:18px;padding:32px;width:100%;max-width:360px;text-align:center}
+.gc h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px}
+.gc p{color:var(--tx2);font-size:13px;margin-bottom:22px;line-height:1.5}
+.gb{width:100%;padding:12px;border-radius:10px;border:1px solid var(--bor2);background:var(--sur2);color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.gb:hover{border-color:var(--acc)}
+.gi{width:18px;height:18px;flex-shrink:0}
+.dm{color:var(--bad);font-size:13px;margin-top:10px;display:none}
+
+#ac{display:none}
+.aw{max-width:1100px;margin:0 auto;padding:32px 20px}
+.at{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px}
+.as{color:var(--tx2);font-size:13px;margin-bottom:24px}
+
+.tabs{display:flex;gap:6px;margin-bottom:22px;flex-wrap:wrap}
+.tb{padding:9px 18px;border-radius:10px;border:1px solid var(--bor);background:var(--sur);color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.tb:hover{border-color:var(--bor2);color:var(--tx)}
+.tb.ta{background:var(--pur);color:#fff;border-color:var(--pur)}
+.tb.dbo{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.25);color:var(--ok)}
+.tb.vro{background:rgba(91,141,238,.1);border-color:rgba(91,141,238,.25);color:var(--acc)}
+.tb.rso{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.25);color:var(--bad)}
+.tb.mto{background:rgba(34,211,238,.1);border-color:rgba(34,211,238,.25);color:var(--teal)}
+.tb.mso{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25);color:var(--pur)}
+.tb.mlo{background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.2);color:var(--teal)}
+.tb.smo{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2);color:var(--warn)}
+.tb.fbo{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.25);color:var(--warn)}
+.tb.sto{background:rgba(34,211,238,.1);border-color:rgba(34,211,238,.25);color:var(--teal)}
+.tb.memo{background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.25);color:var(--gold)}
+.tb.org{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25);color:var(--pur)}
+/* BATCH GRID (Master List) */
+.batch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.batch-card{background:var(--sur2);border:1px solid var(--bor2);border-radius:12px;overflow:hidden}
+.batch-hdr{padding:10px 14px;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:space-between}
+.batch-23{background:rgba(91,141,238,.12);color:var(--acc)}
+.batch-24{background:rgba(52,211,153,.1);color:var(--ok)}
+.batch-25{background:rgba(139,92,246,.12);color:var(--pur)}
+.batch-list{max-height:380px;overflow-y:auto;padding:6px 0}
+.batch-item{display:flex;align-items:center;justify-content:space-between;padding:5px 14px;font-size:12px;border-bottom:1px solid var(--bor)}
+.batch-item:last-child{border-bottom:none}
+.batch-item:hover{background:rgba(255,255,255,.03)}
+.batch-name{color:var(--tx);flex:1}
+.batch-team{font-size:10px;font-weight:700;color:var(--tx3);margin-right:8px}
+.batch-del{width:20px;height:20px;border-radius:4px;border:none;background:transparent;color:var(--tx3);cursor:pointer;font-size:12px;transition:all .15s;flex-shrink:0}
+.batch-del:hover{background:rgba(248,113,113,.15);color:var(--bad)}
+.add-cadet-row{display:flex;gap:6px;padding:10px 12px;border-top:1px solid var(--bor);background:var(--sur)}
+.add-cadet-inp{flex:1;background:var(--sur2);border:1px solid var(--bor);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none}
+.add-cadet-inp:focus{border-color:var(--acc)}
+.add-cadet-btn{padding:6px 12px;border-radius:7px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.team-sel{background:var(--sur2);border:1px solid var(--bor);border-radius:7px;padding:6px;font-size:12px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;width:60px}
+/* SUMMARY GRID */
+.sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.sum-card{background:var(--sur2);border:1px solid var(--bor2);border-radius:12px;overflow:hidden}
+.sum-hdr{padding:10px 14px;font-family:'Syne',sans-serif;font-weight:800;font-size:14px}
+.sum-list{max-height:480px;overflow-y:auto}
+.sum-row{display:flex;justify-content:space-between;padding:6px 14px;font-size:12px;border-bottom:1px solid var(--bor)}
+.sum-row:last-child{border-bottom:none}
+.sum-name{color:var(--tx);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px}
+.sum-pts{font-family:'Syne',sans-serif;font-weight:700;color:var(--ok);flex-shrink:0}
+.sum-pts.neg{color:var(--bad)}
+/* COUNTDOWN */
+.cdown{background:var(--sur2);border:1px solid var(--bor);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.cdown-label{font-size:12px;color:var(--tx3)}
+.cdown-time{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--teal)}
+
+.sp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;transition:all .4s}
+.sp.hid{opacity:0;pointer-events:none;max-height:0;overflow:hidden;margin:0}
+.pc{background:var(--sur);border:1px solid var(--bor2);border-radius:14px;padding:20px}
+.pt{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px}
+.ps{font-size:12px;color:var(--tx3);margin-bottom:16px}
+.ul{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;max-height:260px;overflow-y:auto}
+.ur{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sur2);border-radius:8px;font-size:13px;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}
+.ue{color:var(--tx);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.utg{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:6px;flex-shrink:0}
+.te{background:rgba(91,141,238,.15);color:var(--acc)}
+.ta2{background:rgba(139,92,246,.15);color:var(--pur)}
+.rmu{width:24px;height:24px;border-radius:6px;border:none;background:transparent;color:var(--tx3);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-left:6px;flex-shrink:0}
+.rmu:hover{background:rgba(248,113,113,.15);color:var(--bad)}
+.ar{display:flex;gap:6px}
+.ai{flex:1;background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.ai:focus{border-color:var(--acc)}
+.ai::placeholder{color:var(--tx3)}
+.aub{padding:8px 14px;border-radius:8px;border:none;background:var(--acc);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:opacity .2s}
+.aub:hover{opacity:.85}
+.otb{padding:5px 9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:7px;color:rgba(255,255,255,0.6);cursor:pointer;font-size:13px;transition:all 0.15s;font-family:'DM Sans',sans-serif;line-height:1}
+.otb:hover{background:rgba(139,92,246,0.15);border-color:rgba(139,92,246,0.3);color:#a78bfa}
+.org-tbsep{width:1px;height:18px;background:rgba(255,255,255,0.08)}
+
+.dr{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1),opacity .3s;opacity:0;margin-bottom:0}
+.dr.op{max-height:5000px;opacity:1;margin-bottom:16px}
+.di{background:var(--sur);border:1px solid var(--bor2);border-radius:14px;padding:20px}
+.dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.dt{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.dc{padding:5px 12px;border-radius:7px;border:1px solid var(--bor);background:transparent;color:var(--tx2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.dc:hover{border-color:var(--bad);color:var(--bad)}
+
+.dbs{width:100%;background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;transition:border-color .2s}
+.dbs:focus{border-color:var(--acc)}
+.dbs::placeholder{color:var(--tx3)}
+/* tw replaced above */
+th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--bor);white-space:nowrap;background:var(--sur2)}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--tx);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.pp{color:var(--ok);font-weight:600;font-family:'Syne',sans-serif}
+.pn{color:var(--bad);font-weight:600;font-family:'Syne',sans-serif}
+.bg{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.bdup{background:rgba(248,113,113,.15);color:var(--bad)}
+.bunk{background:rgba(251,191,36,.12);color:var(--warn)}
+.bok{background:rgba(52,211,153,.1);color:var(--ok)}
+.bwin{background:rgba(52,211,153,.12);color:var(--ok)}
+.bloss{background:rgba(248,113,113,.12);color:var(--bad)}
+.drb{width:24px;height:24px;border-radius:5px;border:1px solid var(--bor);background:transparent;color:var(--tx3);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.drb:hover{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.3);color:var(--bad)}
+.dstat{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.dst{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600}
+.dst-t{background:var(--sur2);color:var(--tx)}
+.dst-d{background:rgba(248,113,113,.1);color:var(--bad)}
+.dst-u{background:rgba(251,191,36,.1);color:var(--warn)}
+.dst-c{background:rgba(52,211,153,.08);color:var(--ok)}
+.lm{width:100%;margin-top:8px;padding:9px;border-radius:8px;border:1px dashed var(--bor);background:transparent;color:var(--tx3);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:none}
+.lm:hover{border-color:var(--acc);color:var(--acc)}
+.hcb{width:15px;height:15px;cursor:pointer;accent-color:var(--acc);flex-shrink:0}
+.row-hi td:not(.hc){opacity:.22;text-decoration:line-through}
+.hc{opacity:1!important;text-decoration:none!important}
+.tw-wrap{border-radius:10px;border:1px solid var(--bor);overflow:hidden}
+.tw{overflow-x:auto;overflow-y:auto;max-height:540px}
+.tw thead th{position:sticky;top:0;z-index:5;background:var(--sur2)}
+
+/* MAT RECORDS */
+.mfb{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.mfi{flex:1;min-width:160px;background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.mfi:focus{border-color:var(--teal)}
+.mfi::placeholder{color:var(--tx3)}
+.mdtabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
+.mdt{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bor);background:transparent;color:var(--tx3);transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.mdt:hover{border-color:var(--teal);color:var(--teal)}
+.mdt.mac{background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.3);color:var(--teal)}
+.mdb{margin-bottom:20px;animation:fi .3s ease}
+.mdh{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bor)}
+.mdd{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--teal)}
+.mds{display:flex;gap:5px;flex-wrap:wrap}
+.stag{padding:3px 9px;border-radius:4px;font-size:10px;font-weight:700;background:rgba(34,211,238,.1);color:var(--teal)}
+.mmb{background:var(--sur2);border:1px solid var(--bor);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.mmh{padding:10px 14px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;border-bottom:1px solid var(--bor)}
+.msn{font-size:12px;font-weight:700;color:var(--teal);letter-spacing:.05em;text-transform:uppercase}
+.mvs{font-size:11px;color:var(--tx3);text-align:center}
+.mtl{font-size:12px;font-weight:600}
+.mtl.wl{color:var(--ok)}
+.mtl.ll{color:var(--bad);text-align:right}
+.mpg{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.mpc{padding:8px 12px}
+.mpc:first-child{border-right:1px solid var(--bor)}
+.mch{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.mch.wh{color:var(--ok)}
+.mch.lh{color:var(--bad)}
+.mpr{display:flex;justify-content:space-between;align-items:center;padding:4px 6px;border-radius:5px;font-size:12px;margin-bottom:2px;transition:background .15s}
+.mpr:hover{background:rgba(255,255,255,.03)}
+.mpn{color:var(--tx);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mmp{font-family:'Syne',sans-serif;font-size:11px;font-weight:700}
+.mmp.wp{color:var(--ok)}
+.mmp.lp{color:var(--bad)}
+.mdel{display:block;width:100%;padding:8px;border-top:1px solid var(--bor);border-radius:0 0 10px 10px;background:transparent;border-left:none;border-right:none;border-bottom:none;color:var(--tx3);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center}
+.mdel:hover{background:rgba(248,113,113,.1);color:var(--bad)}
+
+/* RESET */
+.rw{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.18);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.rwt{font-size:13px;font-weight:700;color:var(--bad);margin-bottom:3px}
+.rwx{font-size:12px;color:var(--tx3);line-height:1.5}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.ro{background:var(--sur2);border:1px solid var(--bor);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s}
+.ro:hover{border-color:rgba(248,113,113,.3)}
+.rot{font-size:13px;font-weight:600;margin-bottom:3px}
+.ros{font-size:11px;color:var(--tx3);line-height:1.4}
+.cb{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:14px;margin-top:12px;display:none}
+.cb.sh{display:block}
+.ct{font-size:13px;color:var(--tx);margin-bottom:10px}
+.ct span{color:var(--bad);font-weight:700}
+.ci{width:100%;background:var(--sur);border:1px solid rgba(248,113,113,.25);border-radius:7px;padding:8px 10px;font-size:13px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px}
+.ci:focus{border-color:var(--bad)}
+.cbs{display:flex;gap:8px}
+.rb{padding:10px 18px;border-radius:9px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.rb.rd{background:var(--bad);color:#fff}.rb.rd:hover{opacity:.85}
+.rb.cn{background:var(--sur2);color:var(--tx2)}
+.rb:disabled{opacity:.4;cursor:not-allowed}
+.isec{margin-top:20px;padding-top:20px;border-top:1px solid var(--bor)}
+.it{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px}
+.ix{font-size:12px;color:var(--tx3);margin-bottom:12px;line-height:1.5}
+.fd{border:2px dashed rgba(91,141,238,.2);border-radius:10px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px}
+.fd:hover{border-color:var(--acc);background:rgba(91,141,238,.04)}
+.fdt{font-size:13px;color:var(--tx3)}
+.fdt strong{color:var(--acc)}
+#xi{display:none}
+.ip{background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:12px;margin-bottom:12px;display:none}
+.ipt{font-size:12px;font-weight:600;color:var(--ok);margin-bottom:6px}
+.ipr{font-size:11px;color:var(--tx3);max-height:90px;overflow-y:auto}
+.ib{padding:10px 20px;border-radius:9px;border:none;background:var(--ok);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;transition:opacity .2s}
+.ib:hover{opacity:.85}
+.ib:disabled{opacity:.4;cursor:not-allowed}
+
+/* ADS */
+.adsec{margin-top:20px;padding-top:20px;border-top:1px solid var(--bor)}
+.adt{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px}
+.adx{font-size:12px;color:var(--tx3);margin-bottom:14px;line-height:1.5}
+.adrow{display:flex;align-items:center;justify-content:space-between;background:var(--sur2);border:1px solid var(--bor);border-radius:10px;padding:12px 16px}
+.adi{font-size:13px;color:var(--tx)}
+.adst{font-size:11px;margin-top:2px}
+.tsw{position:relative;width:44px;height:24px;flex-shrink:0}
+.tsw input{opacity:0;width:0;height:0;position:absolute}
+.tsl{position:absolute;cursor:pointer;inset:0;background:var(--bor2);border-radius:12px;transition:.3s}
+.tsl:before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s}
+.tsw input:checked + .tsl{background:var(--ok)}
+.tsw input:checked + .tsl:before{transform:translateX(20px)}
+
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:11px 24px;border-radius:100px;font-size:13px;font-weight:600;z-index:999;display:none;white-space:nowrap;animation:toIn .3s ease;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+@keyframes toIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.cat-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--sur2);border:1px solid var(--bor);border-radius:10px;margin-bottom:8px;transition:all .2s}
+.cat-item:hover{border-color:var(--pur)}
+</style>
+</head>
+<body>
+<div class="pg">
+<nav>
+  <div class="brand">
+    <img src="../logo.png?v=2" alt="HR" onerror="this.style.display='none'">
+    Fleet <span>Admin</span>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center" id="navLinks">
+    <a href="../index.html" class="nb">Lookup</a>
+    <a href="encode.html" class="nb">Encode</a>
+    <a href="admin.html" class="nb act">Admin</a>
+    <div class="upill" id="upill" style="display:none">
+      <div class="uav" id="uav">?</div>
+      <span id="uem">—</span>
+      <span style="cursor:pointer;color:var(--bad);margin-left:4px;font-size:14px" onclick="signOut()">×</span>
+    </div>
+  </div>
+  <button class="mbtn" onclick="toggleMenu()">
+    <span style="display:block;width:20px;height:3px;background:#fff;border-radius:2px"></span>
+    <span style="display:block;width:20px;height:3px;background:#fff;border-radius:2px"></span>
+    <span style="display:block;width:20px;height:3px;background:#fff;border-radius:2px"></span>
+  </button>
+</nav>
+<div class="moverlay" id="moverlay"></div>
+<div class="mdrawer" id="mdrawer">
+  <div class="mhdr">
+    <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px">Menu</span>
+    <button onclick="toggleMenu()" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:20px">×</button>
+  </div>
+  <div class="mc">
+    <a href="../index.html" class="mi menu-lookup">🔍 Lookup</a>
+    <a href="encode.html" class="mi menu-encode">✏️ Encode</a>
+    <a href="admin.html" class="mi menu-admin act">⚙️ Admin</a>
+    <a href="about.html" class="mi menu-about">📜 About</a>
+    <a href="feedback.html" class="mi menu-feedback">💬 Feedback</a>
+  </div>
+</div>
+
+<div id="ag">
+  <div class="gc">
+    <h2>Admin Access</h2>
+    <p>Sign in with an authorized admin Google account.</p>
+    <button class="gb" onclick="signInWithGoogle()">
+      <svg class="gi" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="dm" id="dm">Your account is not an admin.</div>
+  </div>
+</div>
+
+<div id="ac">
+<div class="aw">
+  <div style="background:linear-gradient(135deg,rgba(91,141,238,0.15),rgba(124,92,252,0.15));border:1px solid var(--bor2);border-radius:16px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden">
+    <div style="position:absolute;right:-20px;top:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(124,92,246,0.2),transparent 70%);border-radius:50%"></div>
+    <div class="at" style="font-size:28px">Admin Panel</div>
+    <div class="as" style="margin-bottom:0">Manage encoders, admins, system data, and view reports.</div>
+    <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap">
+      <div style="padding:6px 12px;background:var(--sur2);border-radius:8px;font-size:11px;color:var(--tx2)">⚙️ System Settings</div>
+      <div style="padding:6px 12px;background:var(--sur2);border-radius:8px;font-size:11px;color:var(--tx2)">📊 Data Management</div>
+      <div style="padding:6px 12px;background:var(--sur2);border-radius:8px;font-size:11px;color:var(--tx2)">🔒 Admin Controls</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tb ta" id="tb-encoder" onclick="openTab('encoder')">Encoder</button>
+    <button class="tb" id="tb-admin-mgr" onclick="openTab('admin-mgr')">Admin</button>
+    <button class="tb" id="tb-database" onclick="tgl('database')">Database</button>
+    <button class="tb" id="tb-verify" onclick="tgl('verify')">Verify</button>
+    <button class="tb" id="tb-mat-records" onclick="tgl('mat-records')">MAT Records</button>
+    <button class="tb" id="tb-reset" onclick="tgl('reset')">Reset</button>
+    <button class="tb" id="tb-master" onclick="tgl('master')">Master List</button>
+    <button class="tb" id="tb-summary" onclick="tgl('summary')">Summary</button>
+    <button class="tb" id="tb-feedback" onclick="tgl('feedback')">Feedback</button>
+    <button class="tb" id="tb-memos" onclick="tgl('memos')">Memos</button>
+    <button class="tb" id="tb-org" onclick="tgl('org')">Org Chart</button>
+    <button class="tb" id="tb-status" onclick="tgl('status')">Status</button>
+  </div>
+
+  <div class="sp" id="sp">
+    <div class="pc" id="enc-panel">
+      <div class="pt">Encoder Access</div>
+      <div class="ps">Accounts that can submit merit entries</div>
+      <div class="ul" id="encList"><div style="color:var(--tx3);font-size:13px">Loading…</div></div>
+      <div class="ar">
+        <input class="ai" id="encInp" placeholder="email@gmail.com" type="email">
+        <button class="aub" onclick="addU('encoder')">Add</button>
+      </div>
+    </div>
+    <div class="pc" id="adm-panel" style="display:none">
+      <div class="pt">Admin Access</div>
+      <div class="ps">Accounts that can access this panel</div>
+      <div class="ul" id="admList"><div style="color:var(--tx3);font-size:13px">Loading…</div></div>
+      <div class="ar">
+        <input class="ai" id="admInp" placeholder="email@gmail.com" type="email">
+        <button class="aub" style="background:var(--pur)" onclick="addU('admin')">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATABASE -->
+  <div class="dr" id="dr-database">
+    <div class="di">
+      <div class="dh"><div class="dt">Database — Merit Entries</div><button class="dc" onclick="tgl('database')">Close ×</button></div>
+      <div class="dstat">
+        <div class="dst dst-t" id="dbt">—</div>
+        <div class="dst dst-d" id="dbd">—</div>
+        <div class="dst dst-u" id="dbu">—</div>
+        <div class="dst dst-c" id="dbc">—</div>
+        <button class="dst" style="background:var(--ok);color:#fff;cursor:pointer" onclick="exportExcel()">Export Excel</button>
+        <button class="dst" style="background:var(--acc);color:#fff;cursor:pointer" onclick="exportJSON()">Export JSON</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <input class="dbs" id="dbs" placeholder="Filter by name, reason, operator…" oninput="filterDB()" style="flex:1;min-width:200px">
+        <input type="date" id="dbDateStart" class="dbs" style="width:140px" onchange="filterDB()">
+        <input type="date" id="dbDateEnd" class="dbs" style="width:140px" onchange="filterDB()">
+      </div>
+      <div class="tw-wrap"><div class="tw"><table><thead><tr><th style="width:40px;text-align:center">Hide</th><th style="width:40px">Team</th><th>Cadet</th><th>Details</th><th>Pts</th><th>Operator</th><th>Date</th><th>Status</th><th>×</th></tr></thead><tbody id="dbb"></tbody></table></div></div>
+      <div id="dbCount" style="font-size:11px;color:var(--tx3);text-align:right;margin-top:5px"></div>
+    </div>
+  </div>
+
+  <!-- VERIFY -->
+  <div class="dr" id="dr-verify">
+    <div class="di">
+      <div class="dh"><div class="dt">Verify — Issues Only</div><button class="dc" onclick="tgl('verify')">Close ×</button></div>
+      <div class="dstat">
+        <div class="dst dst-d" id="vrd">—</div>
+        <div class="dst dst-u" id="vru">—</div>
+      </div>
+      <div class="tw-wrap"><div class="tw"><table><thead><tr><th style="width:40px;text-align:center">Hide</th><th style="width:40px">Team</th><th>Cadet</th><th>Details</th><th>Pts</th><th>Operator</th><th>Date</th><th>Issue</th><th>×</th></tr></thead><tbody id="vrb"></tbody></table></div></div>
+    </div>
+  </div>
+
+  <!-- MAT RECORDS -->
+  <div class="dr" id="dr-mat-records">
+    <div class="di">
+      <div class="dh"><div class="dt">MAT Records</div><button class="dc" onclick="tgl('mat-records')">Close ×</button></div>
+      <div class="mfb"><input class="mfi" id="mats" placeholder="Search sport or player…" oninput="renderMAT()"></div>
+      <div class="mdtabs" id="mdtabs"></div>
+      <div id="matb"><div style="text-align:center;padding:32px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--teal)"></span></div></div>
+    </div>
+  </div>
+
+  <!-- RESET -->
+  <div class="dr" id="dr-reset">
+    <div class="di">
+      <div class="dh"><div class="dt">Reset &amp; Import</div><button class="dc" onclick="tgl('reset')">Close ×</button></div>
+      <div class="cdown">
+        <div>
+          <div class="cdown-label">Next auto-reset of Quota ED (1st of next month)</div>
+          <div class="cdown-time" id="edCountdown">Calculating…</div>
+        </div>
+        <div style="font-size:11px;color:var(--tx3);text-align:right">Auto-resets at midnight.<br>Entries are kept, only quota_ed is zeroed.</div>
+      </div>
+      <div class="rw"><div class="rwt">Danger Zone</div><div class="rwx">Factory reset deletes all merit entries and quota values permanently. Cadet names and teams are NOT removed.</div></div>
+      <div class="rg">
+        <div class="ro" onclick="showC('entries')"><div class="rot" style="color:var(--bad)">Reset Merit Entries</div><div class="ros">Deletes all merits, availed, reductions. Names stay.</div></div>
+        <div class="ro" onclick="showC('quotas')"><div class="rot" style="color:var(--warn)">Reset Quotas Only</div><div class="ros">Sets all Quota DR and ED back to 0.</div></div>
+      </div>
+      <div class="cb" id="cfb">
+        <div class="ct">Type <span>CONFIRM</span> to proceed. This cannot be undone.</div>
+        <input class="ci" id="cfi" placeholder="Type CONFIRM…">
+        <div class="cbs">
+          <button class="rb rd" id="cfbtn" onclick="execR()">Execute Reset</button>
+          <button class="rb cn" onclick="hideC()">Cancel</button>
+        </div>
+      </div>
+      <div class="isec">
+        <div class="it">Import Cadets from Excel</div>
+        <div class="ix">Upload an Excel file with <strong>Team</strong>, <strong>Name</strong>, and <strong>Batch</strong> columns (Batch = 2023 / 2024 / 2025). Existing names won't be duplicated.</div>
+        <div class="fd" onclick="document.getElementById('xi').click()" id="fd">
+          <div class="fdt"><strong>Click to browse</strong> or drag &amp; drop</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:3px">.xlsx or .xls</div>
+        </div>
+        <input type="file" id="xi" accept=".xlsx,.xls" onchange="handleX(this)">
+        <div class="ip" id="iprev"><div class="ipt" id="ipt">—</div><div class="ipr" id="ipr"></div></div>
+        <button class="ib" id="ib" onclick="execI()">Import Cadets</button>
+      </div>
+      <!-- ADS -->
+      <div class="adsec">
+        <div class="adt">Monetization — Google AdSense</div>
+        <div class="adx">Non-intrusive footer banner on the lookup page only. Never interrupts encoding or admin. Toggle off instantly.</div>
+        <div class="adrow">
+          <div><div class="adi">Show ads on lookup page</div><div class="adst" id="adst" style="color:var(--tx3)">Loading…</div></div>
+          <label class="tsw"><input type="checkbox" id="adtog" onchange="togAds(this.checked)"><div class="tsl"></div></label>
+        </div>
+        <div style="margin-top:12px;background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--tx3);line-height:1.7">
+          <strong style="color:var(--tx2)">Setup (one-time, free):</strong><br>
+          1. Go to <strong style="color:var(--acc)">adsense.google.com</strong> → sign up → add your Netlify URL<br>
+          2. After approval (1–2 weeks), copy your Publisher ID: <code style="color:var(--warn)">ca-pub-XXXXXXXX</code><br>
+          3. Open <code style="color:var(--warn)">index.html</code>, replace <code>YOUR_ADSENSE_ID</code> → redeploy<br>
+          <strong style="color:var(--tx2)">Expected:</strong> ~$0.50–$3 per 1,000 views. Zero cost to users.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MASTER LIST DRAWER -->
+  <div class="dr" id="dr-master">
+    <div class="di">
+      <div class="dh"><div class="dt">Master List</div><button class="dc" onclick="tgl('master')">Close ×</button></div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">All cadets by batch. Add or remove names. Removing a cadet deletes all their merit entries.</div>
+      <div class="batch-grid" id="masterGrid"><!-- rendered by JS --></div>
+    </div>
+  </div>
+
+  <!-- SUMMARY DRAWER -->
+  <div class="dr" id="dr-summary">
+    <div class="di">
+      <div class="dh"><div class="dt">Summary</div><button class="dc" onclick="tgl('summary')">Close ×</button></div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">Current net merits per cadet, sorted alphabetically. Auto-updates from live database.</div>
+      <div class="sum-grid" id="summaryGrid"><!-- rendered by JS --></div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK DRAWER -->
+  <div class="dr" id="dr-feedback">
+    <div class="di">
+      <div class="dh"><div class="dt">Feedback</div><button class="dc" onclick="tgl('feedback')">Close ×</button></div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">Feedback submitted by users via the feedback form.</div>
+      <div id="feedbackList" style="display:flex;flex-direction:column;gap:10px;max-height:480px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+  <!-- MEMOS DRAWER -->
+  <div class="dr" id="dr-memos">
+    <div class="di">
+      <div class="dh"><div class="dt">📜 Memos & Documents</div><button class="dc" onclick="tgl('memos')">Close ×</button></div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:16px">Upload memos and documents for users to view on the About page.</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <input class="ai" id="memoTitle" placeholder="Memo title..." style="flex:1;min-width:150px">
+        <input type="file" id="memoFile" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp" onchange="handleMemoUpload(this)" style="flex:1;min-width:120px">
+        <button class="aub" style="background:var(--gold);color:#000" onclick="addMemo()">📎 Upload Memo</button>
+      </div>
+      <div id="memoListAdmin" style="display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+  <!-- ORG CHART PANEL - PREMIUM CANVAS WORKSPACE -->
+  <div class="dr" id="dr-org" style="width:100%!important;left:0;top:0;height:100vh;border-radius:0">
+    <div class="di" style="height:100vh;display:flex;flex-direction:column;padding:0;background:linear-gradient(135deg,#070B14,#0F172A)">
+      
+      <!-- TOP TOOLBAR -->
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(15,23,42,0.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;flex-wrap:wrap">
+        <div style="font-family:Syne,sans-serif;font-weight:800;font-size:15px;color:#fff;letter-spacing:-0.5px;margin-right:8px">🏢 Org Chart</div>
+        <span id="orgSaveStatus" style="font-size:10px;color:#22d3ee;display:none;background:rgba(34,211,238,0.1);padding:3px 8px;border-radius:6px">✓ Saved</span>
+        
+        <div style="flex:1;min-width:8px"></div>
+        
+        <div style="position:relative">
+          <input type="text" id="orgSearch" placeholder="Search members..." 
+            style="padding:6px 12px 6px 28px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#cbd5e1;font-size:12px;width:140px;outline:none"
+            oninput="searchOrgMembers(this.value)">
+          <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.25);font-size:11px">🔍</span>
+        </div>
+        
+        <select id="orgFilterCat" style="padding:6px 8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#cbd5e1;font-size:11px;outline:none" onchange="filterOrgByCat()">
+          <option value="">All Departments</option>
+        </select>
+        
+        <div class="org-tbsep"></div>
+        
+        <button class="otb" onclick="expandAllOrg()" title="Expand All">⊞</button>
+        <button class="otb" onclick="collapseAllOrg()" title="Collapse">⊟</button>
+        <button class="otb" onclick="autoArrangeTree()" title="Tree Layout">⟐</button>
+        <button class="otb" onclick="autoArrangeCluster()" title="Cluster Layout">◈</button>
+        <button class="otb" onclick="autoArrangeRadial()" title="Radial Layout">◎</button>
+        
+        <div class="org-tbsep"></div>
+        
+        <button class="otb" onclick="undoOrgChange()" title="Undo">↩</button>
+        <button class="otb" onclick="redoOrgChange()" title="Redo">↪</button>
+        
+        <div class="org-tbsep"></div>
+        
+        <button class="otb" onclick="orgZoomAdj(-0.15)" title="Zoom Out">−</button>
+        <span id="orgZoomLevel" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:36px;text-align:center;font-variant-numeric:tabular-nums">100%</span>
+        <button class="otb" onclick="orgZoomAdj(0.15)" title="Zoom In">+</button>
+        <button class="otb" onclick="resetOrgView()" title="Reset View">⟲</button>
+        
+        <div class="org-tbsep"></div>
+        
+        <button class="otb" style="background:rgba(139,92,246,0.2);border-color:rgba(139,92,246,0.3);color:#a78bfa" onclick="var b=document.getElementById('orgAddBar');b.style.display=b.style.display==='none'?'flex':'none'" title="Toggle Add Bar">＋</button>
+        
+        <div class="org-tbsep"></div>
+        
+        <button class="otb" onclick="toggleOrgFullscreen()" title="Fullscreen">⛶</button>
+        
+        <div class="org-tbsep"></div>
+        
+        <button class="otb" id="orgConnectBtn" onclick="toggleOrgConnect()" title="Draw connection lines">⚡</button>
+        
+        <button class="dc" onclick="tgl('org')" style="padding:6px 12px;font-size:12px">✕</button>
+      </div>
+      
+      <!-- ADD MEMBER BAR -->
+      <div id="orgAddBar" style="display:flex;padding:8px 16px;background:rgba(15,23,42,0.6);border-bottom:1px solid rgba(255,255,255,0.04);flex-shrink:0;gap:6px;flex-wrap:wrap;align-items:center">
+        <input class="ai" id="orgName" placeholder="Full Name" style="flex:1;min-width:100px;font-size:12px;padding:6px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e2e8f0" oninput="showOrgNameSug()">
+        <div id="orgNameSug" style="position:absolute;background:rgba(15,23,42,0.95);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;max-height:140px;overflow-y:auto;display:none;z-index:100;min-width:180px;top:40px"></div>
+        <input class="ai" id="orgPos" placeholder="Position" style="flex:1;min-width:100px;font-size:12px;padding:6px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e2e8f0">
+        <select class="ai" id="orgCat" style="min-width:90px;font-size:12px;padding:6px 8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#cbd5e1">
+          <option value="">Dept...</option>
+        </select>
+        <button onclick="openCategoryManager()" style="padding:6px 8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.5);cursor:pointer;font-size:11px">⚙️</button>
+        <input type="file" id="orgPhoto" accept="image/*" style="display:none" onchange="handleOrgPhoto(this)">
+        <button class="aub" style="background:rgba(139,92,246,0.3);border:1px solid rgba(139,92,246,0.3)" onclick="document.getElementById('orgPhoto').click()">📷</button>
+        <button class="aub" style="background:rgba(34,211,238,0.2);border:1px solid rgba(34,211,238,0.3);color:#22d3ee" onclick="addOrgMember()">＋ Add</button>
+      </div>
+      
+      <!-- MAIN: CANVAS + FLOATING PROPS -->
+      <div style="flex:1;display:flex;overflow:hidden;position:relative">
+        
+        <!-- CANVAS AREA -->
+        <div id="orgCanvasContainer" style="flex:1;overflow:hidden;position:relative;cursor:grab">
+          <!-- Background dots layer -->
+          <div id="orgCanvasBg" style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.03) 0.5px,transparent 0.5px);background-size:24px 24px;pointer-events:none;z-index:0"></div>
+          
+          <!-- Ambient glow layers -->
+          <div style="position:absolute;top:-20%;left:-10%;width:50%;height:50%;background:radial-gradient(ellipse,rgba(139,92,246,0.04),transparent 70%);pointer-events:none;z-index:0"></div>
+          <div style="position:absolute;bottom:-10%;right:-5%;width:40%;height:40%;background:radial-gradient(ellipse,rgba(6,182,212,0.03),transparent 70%);pointer-events:none;z-index:0"></div>
+          <div style="position:absolute;top:40%;left:40%;width:30%;height:30%;background:radial-gradient(ellipse,rgba(168,85,247,0.03),transparent 70%);pointer-events:none;z-index:0"></div>
+          
+          <!-- Zoomable canvas -->
+          <div id="orgCanvas" style="position:absolute;top:0;left:0;transform-origin:0 0;transition:transform 0.15s ease;z-index:1">
+            <div id="orgListAdmin" style="position:relative"></div>
+            <!-- SVG connector layer -->
+            <svg id="orgConnectors" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:0"></svg>
+          </div>
+          
+          <!-- Mini-map -->
+          <div id="orgMiniMap" style="position:absolute;bottom:16px;right:16px;width:160px;height:120px;background:rgba(7,11,20,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.08);border-radius:10px;z-index:10;overflow:hidden;display:none;cursor:pointer">
+            <div id="orgMiniMapContent" style="position:relative;width:100%;height:100%"></div>
+            <div id="orgMiniMapViewport" style="position:absolute;border:1px solid rgba(139,92,246,0.5);background:rgba(139,92,246,0.08);border-radius:2px;pointer-events:none"></div>
+          </div>
+          
+          <!-- Bottom-right zoom controls overlay -->
+          <div style="position:absolute;bottom:16px;left:16px;display:flex;gap:4px;z-index:5;background:rgba(7,11,20,0.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:4px">
+            <button class="otb" onclick="orgZoomAdj(-0.15)" style="padding:4px 8px;font-size:11px">−</button>
+            <span style="font-size:10px;color:rgba(255,255,255,0.5);padding:4px 6px;min-width:32px;text-align:center;font-variant-numeric:tabular-nums" id="orgZoomLevel2">100%</span>
+            <button class="otb" onclick="orgZoomAdj(0.15)" style="padding:4px 8px;font-size:11px">+</button>
+            <div style="width:1px;background:rgba(255,255,255,0.1);margin:2px 4px"></div>
+            <button class="otb" onclick="resetOrgView()" style="padding:4px 8px;font-size:11px" title="Fit to view">⟲</button>
+            <button class="otb" onclick="toggleMiniMap()" style="padding:4px 8px;font-size:11px" title="Mini-map">🗺</button>
+          </div>
+        </div>
+        
+        <!-- FLOATING PROPERTIES PANEL (glassmorphism) -->
+        <div id="orgPropsPanel" style="position:absolute;top:12px;right:12px;width:300px;max-height:calc(100% - 24px);background:rgba(15,23,42,0.75);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:0;display:none;z-index:20;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.4);flex-direction:column">
+          <div style="padding:16px 16px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.06)">
+            <div style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:#e2e8f0">Properties</div>
+            <button onclick="closeOrgPanel()" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:15px;padding:2px 6px;border-radius:4px">✕</button>
+          </div>
+          <div style="padding:16px;overflow-y:auto;flex:1">
+            <input type="hidden" id="editOrgId">
+            
+            <!-- Profile preview -->
+            <div style="text-align:center;margin-bottom:16px">
+              <div id="editOrgPreview" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,rgba(139,92,246,0.3),rgba(6,182,212,0.3));margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:700;border:2px solid rgba(255,255,255,0.1);overflow:hidden"></div>
+              <button onclick="document.getElementById('editOrgPhoto').click()" style="font-size:10px;color:rgba(168,85,247,0.7);background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:6px;padding:4px 10px;cursor:pointer">Change Photo</button>
+              <input type="file" id="editOrgPhoto" accept="image/*" style="display:none" onchange="handleEditOrgPhoto(this)">
+            </div>
+            
+            <div style="margin-bottom:10px">
+              <label style="font-size:9px;color:rgba(255,255,255,0.35);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">Full Name</label>
+              <input class="ai" id="editOrgName" style="width:100%;font-size:12px;padding:7px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e2e8f0">
+            </div>
+            <div style="margin-bottom:10px">
+              <label style="font-size:9px;color:rgba(255,255,255,0.35);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">Position / Title</label>
+              <input class="ai" id="editOrgPos" style="width:100%;font-size:12px;padding:7px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e2e8f0">
+            </div>
+            <div style="margin-bottom:10px">
+              <label style="font-size:9px;color:rgba(255,255,255,0.35);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">Department</label>
+              <select class="ai" id="editOrgCat" style="width:100%;font-size:12px;padding:7px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#cbd5e1"></select>
+            </div>
+            <div style="margin-bottom:16px">
+              <label style="font-size:9px;color:rgba(255,255,255,0.35);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">Description</label>
+              <textarea class="ai" id="editOrgDesc" style="width:100%;height:64px;resize:none;font-size:11px;padding:7px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#cbd5e1" placeholder="Optional role description..."></textarea>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button onclick="saveOrgEdit()" style="flex:1;padding:8px;background:linear-gradient(135deg,rgba(139,92,246,0.4),rgba(6,182,212,0.3));border:1px solid rgba(139,92,246,0.3);border-radius:8px;color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer">Save Changes</button>
+              <button onclick="deleteOrgFromPanel()" style="padding:8px 12px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);border-radius:8px;color:#fca5a5;cursor:pointer;font-size:11px">Delete</button>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY MANAGER MODAL -->
+  <div id="categoryManagerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;align-items:center;justify-content:center">
+    <div style="background:var(--sur);border:1px solid var(--bor2);border-radius:16px;width:90%;max-width:500px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
+      <div style="padding:20px;border-bottom:1px solid var(--bor);display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:Syne,sans-serif;font-weight:700;font-size:18px">Manage Categories</div>
+        <button onclick="closeCategoryManager()" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:20px">✕</button>
+      </div>
+      <div style="padding:16px;border-bottom:1px solid var(--bor)">
+        <button onclick="addNewCategoryFromModal()" style="padding:10px 16px;background:var(--acc);border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;width:100%">+ Add New Category</button>
+      </div>
+      <div id="categoryList" style="flex:1;overflow-y:auto;padding:12px">
+        <!-- Categories loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS DRAWER -->
+  <div class="dr" id="dr-status">
+    <div class="di">
+      <div class="dh"><div class="dt">Supabase Status</div><button class="dc" onclick="tgl('status')">Close ×</button></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
+        <div style="background:var(--sur2);border:1px solid var(--bor2);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:800;font-family:'Syne',sans-serif;color:var(--teal)" id="stCadets">—</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:4px">Cadets</div>
+        </div>
+        <div style="background:var(--sur2);border:1px solid var(--bor2);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:800;font-family:'Syne',sans-serif;color:var(--ok)" id="stEntries">—</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:4px">Merit Entries</div>
+        </div>
+        <div style="background:var(--sur2);border:1px solid var(--bor2);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:800;font-family:'Syne',sans-serif;color:var(--pur)" id="stEncoders">—</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:4px">Encoders</div>
+        </div>
+        <div style="background:var(--sur2);border:1px solid var(--bor2);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:800;font-family:'Syne',sans-serif;color:var(--acc)" id="stAdmins">—</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:4px">Admins</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
+        <div style="background:var(--sur2);border:1px solid var(--bor2);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:800;font-family:'Syne',sans-serif;color:var(--warn)" id="stMAT">—</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:4px">MAT Records</div>
+        </div>
+        <div style="background:var(--sur2);border:1px solid var(--bor2);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:800;font-family:'Syne',sans-serif;color:var(--bad)" id="stReports">—</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:4px">Reports/Feedback</div>
+        </div>
+      </div>
+      <div style="background:var(--sur2);border:1px solid var(--bor2);border-radius:12px;padding:16px">
+        <div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:8px">Supabase Project</div>
+        <div style="font-size:11px;color:var(--tx3);line-height:1.8">
+          <div><span style="color:var(--tx2)">Project URL:</span> <span style="font-family:monospace">bgxgdgoegnjxuzatiqed.supabase.co</span></div>
+          <div><span style="color:var(--tx2)">Plan:</span> <span style="color:var(--ok)">Free Tier</span></div>
+          <div><span style="color:var(--tx2)">Database:</span> <span style="color:var(--ok)">✓ Connected</span></div>
+          <div><span style="color:var(--tx2)">Auth:</span> <span style="color:var(--ok)">✓ Enabled</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+function toggleMenu() {
+  var drawer = document.getElementById('mdrawer');
+  var overlay = document.getElementById('moverlay');
+  if (drawer.classList.contains('on')) {
+    drawer.classList.remove('on');
+    overlay.classList.remove('on');
+    overlay.style.display = 'none';
+  } else {
+    drawer.classList.add('on');
+    overlay.classList.add('on');
+    overlay.style.display = 'block';
+  }
+}
+
+const db=getDB();
+let adminEmail='',allE=[],allCN=new Set(),filtE=[],pReset=null,impD=[],hiddenRows=new Set(),cadetTeamMap={};
+let allMAT=[],activeDate='all';
+
+function showG(denied) {
+  var ag=document.getElementById('ag'),ac=document.getElementById('ac'),dm=document.getElementById('dm');
+  if(ag)ag.style.display='flex';
+  if(ac)ac.style.display='none';
+  if(dm)dm.style.display=denied?'block':'none';
+}
+
+async function boot(){
+  try{
+    const {session,isAdmin}=await initAuth();
+    if(!session){showG(false);return;}
+    if(!isAdmin){showG(true);return;}
+    const email=session.user.email.toLowerCase();
+    adminEmail=email;
+    document.getElementById('ag').style.display='none';
+    document.getElementById('ac').style.display='block';
+    document.getElementById('upill').style.display='flex';
+    document.getElementById('uav').textContent=email[0].toUpperCase();
+    document.getElementById('uem').textContent=email.split('@')[0];
+    loadEnc();loadHiddenRows();loadAds();startEdCountdown();
+  }catch(e){showG(false);}
+}
+
+// Setup overlay click to close
+document.getElementById('moverlay').addEventListener('click', toggleMenu);
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+  var drawer = document.getElementById('mdrawer');
+  var overlay = document.getElementById('moverlay');
+  var mbtn = document.querySelector('.mbtn');
+  if (drawer.classList.contains('on') && !drawer.contains(e.target) && !mbtn.contains(e.target)) {
+    drawer.classList.remove('on');
+    overlay.classList.remove('on');
+    overlay.style.display = 'none';
+  }
+});
+
+let adraw=null;
+function openTab(n){
+  if(adraw)tgl(adraw,true);
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('ta','dbo','vro','rso','mto'));
+  document.getElementById('tb-'+n)?.classList.add('ta');
+  document.getElementById('sp').classList.remove('hid');
+  if(n==='encoder'){document.getElementById('enc-panel').style.display='block';document.getElementById('adm-panel').style.display='none';}
+  else if(n==='admin-mgr'){document.getElementById('enc-panel').style.display='none';document.getElementById('adm-panel').style.display='block';loadAdm();}
+}
+function tgl(n,fc=false){
+  const dr=document.getElementById('dr-'+n);
+  const btn=document.getElementById('tb-'+n);
+  const isO=dr.classList.contains('op');
+  var allCls=['ta','dbo','vro','rso','mto','mso','mlo','smo'];
+  if(isO||fc){
+    dr.classList.remove('op');
+    allCls.forEach(function(c){btn.classList.remove(c);});
+    document.getElementById('sp').classList.remove('hid');
+    adraw=null;
+  } else {
+    if(adraw){
+      var prevDr=document.getElementById('dr-'+adraw);
+      var prevBtn=document.getElementById('tb-'+adraw);
+      if(prevDr)prevDr.classList.remove('op');
+      if(prevBtn)allCls.forEach(function(c){prevBtn.classList.remove(c);});
+    }
+    dr.classList.add('op');
+    const cm={database:'dbo',verify:'vro',reset:'rso','mat-records':'mto',master:'mlo',summary:'smo',feedback:'fbo',memos:'memo',org:'org',status:'sto'};
+    btn.classList.add(cm[n]||'ta');
+    document.querySelectorAll('.tb').forEach(b=>b.classList.remove('ta'));
+    document.getElementById('sp').classList.add('hid');
+    adraw=n;
+    if(n==='database'){loadDB();setTimeout(setupDbScroll,600);}
+    if(n==='verify')loadVer();
+    if(n==='mat-records')loadMAT();
+    if(n==='master')loadMasterList();
+    if(n==='summary')loadSummary();
+    if(n==='feedback')loadFeedback();
+    if(n==='memos')loadMemosAdmin();
+    if(n==='org')loadOrgAdmin();
+    if(n==='status')loadStatus();
+  }
+}
+
+async function loadEnc(){
+  const {data}=await db.from('allowed_encoders').select('*').order('email');
+  const l=document.getElementById('encList');l.innerHTML='';
+  if(!data?.length){l.innerHTML='<div style="color:var(--tx3);font-size:13px">No encoders.</div>';return;}
+  data.forEach(u=>l.appendChild(mkUR(u.email,'te','encoder')));
+}
+async function loadAdm(){
+  const {data}=await db.from('allowed_admins').select('*').order('email');
+  const l=document.getElementById('admList');l.innerHTML='';
+  if(!data?.length){l.innerHTML='<div style="color:var(--tx3);font-size:13px">No admins.</div>';return;}
+  data.forEach(u=>l.appendChild(mkUR(u.email,'ta2','admin')));
+}
+function mkUR(email,tc,type){
+  const d=document.createElement('div');d.className='ur';
+  d.innerHTML=`<span class="ue" title="${email}">${email}</span><span class="utg ${tc}">${tc==='te'?'ENC':'ADM'}</span><button class="rmu" onclick="delU('${email}','${type}')">×</button>`;
+  return d;
+}
+async function addU(type){
+  const inp=document.getElementById(type==='encoder'?'encInp':'admInp');
+  const email=inp.value.trim().toLowerCase();
+  if(!email||!email.includes('@')){toast('Enter a valid email.','warn');return;}
+  const tbl=type==='encoder'?'allowed_encoders':'allowed_admins';
+  const {error}=await db.from(tbl).insert([{email,added_by:adminEmail}]);
+  if(error){toast(error.code==='23505'?'Already exists.':'Error: '+error.message,'bad');return;}
+  inp.value='';toast('Added!','ok');type==='encoder'?loadEnc():loadAdm();
+}
+async function delU(email,type){
+  if(!confirm(`Remove ${email}?`))return;
+  const tbl=type==='encoder'?'allowed_encoders':'allowed_admins';
+  const {error}=await db.from(tbl).delete().eq('email',email);
+  if(error){toast('Error: '+error.message,'bad');return;}
+  toast('Removed.','ok');type==='encoder'?loadEnc():loadAdm();
+}
+
+async function loadDB(){
+  var tb=document.getElementById('dbb');
+  tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--acc)"></span> Loading…</td></tr>';
+  // Load cadets first for team lookup
+  var cRes=await db.from('cadets').select('name,team');
+  cadetTeamMap={};
+  if(cRes.data)cRes.data.forEach(function(c){cadetTeamMap[c.name.toUpperCase()]=c.team;});
+  allCN=new Set(Object.keys(cadetTeamMap));
+  // Load ALL entries in 1000-row batches
+  var allEnts=[],from=0,bs=1000,done=false;
+  while(!done){
+    var pg=await db.from('merit_entries').select('*').order('entry_date',{ascending:false}).range(from,from+bs-1);
+    if(pg.error||!pg.data||!pg.data.length){done=true;break;}
+    allEnts=allEnts.concat(pg.data);
+    if(pg.data.length<bs)done=true; else from+=bs;
+  }
+  // Detect duplicates: same name+merit+details+availed+date = dup
+  var pc={};
+  allEnts.forEach(function(e){
+    var k=(e.cadet_name||'').toUpperCase()+'||'+(e.details||e.details_availed||'')+'||'+String(e.merit||0)+'||'+String(e.availed||0)+'||'+(e.entry_date||'').slice(0,10);
+    pc[k]=(pc[k]||0)+1;
+  });
+  allE=allEnts.map(function(e){
+    var k=(e.cadet_name||'').toUpperCase()+'||'+(e.details||e.details_availed||'')+'||'+String(e.merit||0)+'||'+String(e.availed||0)+'||'+(e.entry_date||'').slice(0,10);
+    e._d=(pc[k]>1);
+    e._u=!allCN.has((e.cadet_name||'').toUpperCase());
+    return e;
+  });
+  var d2=0,u2=0,cl=0;
+  allE.forEach(function(e){if(e._d)d2++;else if(e._u)u2++;else cl++;});
+  document.getElementById('dbt').textContent=allE.length+' total';
+  document.getElementById('dbd').textContent=d2+' dups';
+  document.getElementById('dbu').textContent=u2+' unknown';
+  document.getElementById('dbc').textContent=cl+' clean';
+  filtE=allE.slice();
+  renderDB();
+}
+function filterDB(){
+  var q=document.getElementById('dbs').value.toLowerCase();
+  var ds=document.getElementById('dbDateStart').value;
+  var de=document.getElementById('dbDateEnd').value;
+  filtE=allE.filter(function(e){
+    var matchText=!q||(e.cadet_name||'').toLowerCase().includes(q)||(e.details||'').toLowerCase().includes(q)||(e.details_availed||'').toLowerCase().includes(q)||(e.operator||'').toLowerCase().includes(q);
+    var ed=e.entry_date?e.entry_date.slice(0,10):'';
+    var matchStart=!ds||ed>=ds;
+    var matchEnd=!de||ed<=de;
+    return matchText&&matchStart&&matchEnd;
+  });
+  renderDB();
+}
+function exportExcel(){
+  if(!filtE.length){toast('No data to export.','warn');return;}
+  var data=filtE.map(function(e){
+    var team=cadetTeamMap[(e.cadet_name||'').toUpperCase()]||'-';
+    return{Team:team,Cadet:e.cadet_name,Details:e.details||e.details_availed||'-',Points:e.merit||e.availed||0,Operator:e.operator,Date:e.entry_date?e.entry_date.slice(0,10):'-',Status:e._d?'Duplicate':e._u?'Unknown':'OK'};
+  });
+  var ws=XLSX.utils.json_to_sheet(data);
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Merit Entries');
+  XLSX.writeFile(wb,'merit_entries_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  toast('Exported '+data.length+' entries.','ok');
+}
+function exportJSON(){
+  if(!filtE.length){toast('No data to export.','warn');return;}
+  var data={merits:filtE.map(function(e){return{cadet_name:e.cadet_name,details:e.details||e.details_availed,merit:e.merit,availed:e.availed,operator:e.operator,entry_date:e.entry_date,status:e._d?'duplicate':e._u?'unknown':'ok'};}),exported_at:new Date().toISOString()};
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='merit_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  toast('JSON backup downloaded.','ok');
+}
+var _dbPage=0,_dbPageSize=200;
+function renderDB(){
+  _dbPage=0;
+  var tb=document.getElementById('dbb');
+  tb.innerHTML='';
+  var slice=filtE.slice(0,_dbPageSize);
+  var frag=document.createDocumentFragment();
+  slice.forEach(function(e){frag.appendChild(mkER(e));});
+  tb.appendChild(frag);
+  var cnt=document.getElementById('dbCount');
+  if(cnt)cnt.textContent='Showing '+slice.length+' of '+filtE.length+' entries — scroll for more';
+  if(!slice.length)tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--tx3)">No entries.</td></tr>';
+}
+// Append more rows when user scrolls near bottom
+function setupDbScroll(){
+  var wrap=document.querySelector('#dr-database .tw');
+  if(!wrap)return;
+  wrap.addEventListener('scroll',function(){
+    if(wrap.scrollTop+wrap.clientHeight>=wrap.scrollHeight-200){
+      var next=(_dbPage+1)*_dbPageSize;
+      var more=filtE.slice(next,next+_dbPageSize);
+      if(!more.length)return;
+      _dbPage++;
+      var tb=document.getElementById('dbb');
+      var frag=document.createDocumentFragment();
+      more.forEach(function(e){frag.appendChild(mkER(e));});
+      tb.appendChild(frag);
+      var cnt=document.getElementById('dbCount');
+      if(cnt){
+        var shown=Math.min((_dbPage+1)*_dbPageSize,filtE.length);
+        cnt.textContent='Showing '+shown+' of '+filtE.length+' entries'+(shown<filtE.length?' — scroll for more':'');
+      }
+    }
+  });
+}
+
+function mkER(e){
+  var pts=e.merit||e.availed||0,isAv=e.availed>0;
+  var det=e.details||e.details_availed||'-';
+  var ds=new Date(e.entry_date).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+  var bg=e._d?'<span class="bg bdup">Dup</span>':e._u?'<span class="bg bunk">Unknown</span>':'<span class="bg bok">OK</span>';
+  var isHid=hiddenRows.has(e.id);
+  var team=cadetTeamMap[(e.cadet_name||'').toUpperCase()]||'-';
+  var tr=document.createElement('tr');
+  tr.id='er'+e.id;
+  if(isHid)tr.classList.add('row-hi');
+  var h='<td class="hc" style="text-align:center;width:40px;padding:6px 2px">';
+  h+='<input type="checkbox" class="hcb" '+(isHid?'checked ':'')+' onchange="toggleHide('+e.id+',this.checked)"></td>';
+  h+='<td style="color:var(--tx3);font-size:11px;font-weight:700;text-align:center">'+team+'</td>';
+  h+='<td style="font-weight:500;min-width:160px;max-width:180px;white-space:normal;word-break:break-word">'+(e.cadet_name||'-')+'</td>';
+  h+='<td style="max-width:160px;white-space:normal;word-break:break-word">'+det+'</td>';
+  h+='<td class="'+(isAv?'pn':'pp')+'" style="white-space:nowrap">'+(isAv?'-':'+')+pts+'</td>';
+  h+='<td style="color:var(--tx3)">'+(e.operator||'-')+'</td>';
+  h+='<td style="color:var(--tx3);white-space:nowrap">'+ds+'</td>';
+  h+='<td>'+bg+'</td>';
+  h+='<td class="hc"><button class="drb" onclick="delE('+e.id+')">x</button></td>';
+  tr.innerHTML=h;
+  return tr;
+}
+async function delE(id){
+  if(!confirm('Delete this entry?'))return;
+  const {error}=await db.from('merit_entries').delete().eq('id',id);
+  if(error){toast('Error: '+error.message,'bad');return;}
+  document.getElementById('er'+id)?.remove();
+  allE=allE.filter(e=>e.id!==id);filtE=filtE.filter(e=>e.id!==id);
+  toast('Deleted.','ok');
+}
+async function loadVer(){
+  const tb=document.getElementById('vrb');
+  tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--acc)"></span></td></tr>';
+  if(!allE.length)await loadDB();
+  const iss=allE.filter(e=>e._d||e._u);
+  document.getElementById('vrd').textContent=iss.filter(e=>e._d).length+' duplicates';
+  document.getElementById('vru').textContent=iss.filter(e=>!e._d&&e._u).length+' unknown';
+  tb.innerHTML='';
+  if(!iss.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--ok)">All clean!</td></tr>';return;}
+  iss.forEach(e=>tb.appendChild(mkER(e)));
+}
+
+// MAT RECORDS
+async function loadMAT(){
+  document.getElementById('matb').innerHTML='<div style="text-align:center;padding:32px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--teal)"></span></div>';
+  const {data}=await db.from('mat_records').select('*').order('record_date',{ascending:false}).order('sport').order('result');
+  allMAT=data||[];buildDateTabs();renderMAT();
+}
+function buildDateTabs(){
+  const dates=[...new Set(allMAT.map(r=>r.record_date))].sort((a,b)=>b.localeCompare(a));
+  const c=document.getElementById('mdtabs');c.innerHTML='';
+  const ab=document.createElement('button');ab.className='mdt mac';ab.textContent='All Dates';ab.onclick=()=>{activeDate='all';document.querySelectorAll('.mdt').forEach(b=>b.classList.remove('mac'));ab.classList.add('mac');renderMAT();};
+  c.appendChild(ab);
+  dates.forEach(d=>{
+    const b=document.createElement('button');b.className='mdt';
+    const f=new Date(d+'T12:00:00').toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+    b.textContent=f;b.onclick=()=>{activeDate=d;document.querySelectorAll('.mdt').forEach(x=>x.classList.remove('mac'));b.classList.add('mac');renderMAT();};
+    c.appendChild(b);
+  });
+}
+function renderMAT(){
+  const q=(document.getElementById('mats').value||'').toLowerCase();
+  let recs=allMAT;
+  if(activeDate!=='all')recs=recs.filter(r=>r.record_date===activeDate);
+  if(q)recs=recs.filter(r=>(r.sport||'').toLowerCase().includes(q)||(r.player_name||'').toLowerCase().includes(q));
+  const c=document.getElementById('matb');
+  if(!recs.length){c.innerHTML='<div style="text-align:center;padding:32px;color:var(--tx3)">No MAT records found.</div>';return;}
+  const byDate={};
+  recs.forEach(r=>{
+    if(!byDate[r.record_date])byDate[r.record_date]={};
+    if(!byDate[r.record_date][r.sport])byDate[r.record_date][r.sport]={};
+    const tk=r.result==='WIN'?'W'+r.team_number:'L'+r.team_number;
+    if(!byDate[r.record_date][r.sport][tk])byDate[r.record_date][r.sport][tk]={result:r.result,team_number:r.team_number,players:[]};
+    byDate[r.record_date][r.sport][tk].players.push(r);
+  });
+  c.innerHTML='';
+  Object.keys(byDate).sort((a,b)=>b.localeCompare(a)).forEach(date=>{
+    const dd=document.createElement('div');dd.className='mdb';
+    const fd=new Date(date+'T12:00:00').toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    const sports=Object.keys(byDate[date]);
+    dd.innerHTML=`<div class="mdh"><div class="mdd">${fd}</div><div class="mds">${sports.map(s=>`<span class="stag">${s}</span>`).join('')}</div></div>`;
+    sports.forEach(sport=>{
+      const teams=byDate[date][sport];
+      const wt=Object.values(teams).filter(t=>t.result==='WIN');
+      const lt=Object.values(teams).filter(t=>t.result==='LOSS');
+      const mx=Math.max(wt.length,lt.length);
+      for(let i=0;i<mx;i++){
+        const w=wt[i],l=lt[i];
+        const mb=document.createElement('div');mb.className='mmb';
+        const wlbl=w?`WIN — Team ${w.team_number} · +${w.players[0]?.merit||0} pts`:'—';
+        const llbl=l?`LOSS — Team ${l.team_number} · +${l.players[0]?.merit||0} pts`:'—';
+        mb.innerHTML=`
+          <div class="mmh">
+            <div><div class="msn">${sport}</div><div class="mtl wl">${wlbl}</div></div>
+            <div class="mvs">VS</div>
+            <div style="text-align:right"><div class="msn">&nbsp;</div><div class="mtl ll">${llbl}</div></div>
+          </div>
+          <div class="mpg">
+            <div class="mpc">
+              <div class="mch wh">WIN Players</div>
+              ${w?w.players.map(p=>`<div class="mpr"><span class="mpn">${p.player_name}</span><span class="mmp wp">+${p.merit}</span></div>`).join(''):'<div style="color:var(--tx3);font-size:12px;padding:4px 6px">—</div>'}
+            </div>
+            <div class="mpc">
+              <div class="mch lh">LOSS Players</div>
+              ${l?l.players.map(p=>`<div class="mpr"><span class="mpn">${p.player_name}</span><span class="mmp lp">+${p.merit}</span></div>`).join(''):'<div style="color:var(--tx3);font-size:12px;padding:4px 6px">—</div>'}
+            </div>
+          </div>`;
+        const delB=document.createElement('button');delB.className='mdel';delB.textContent='Delete this match';
+        const ids=[...(w?.players||[]),...(l?.players||[])].map(p=>p.id);
+        delB.onclick=async()=>{if(!confirm(`Delete this ${sport} match?`))return;const {error}=await db.from('mat_records').delete().in('id',ids);if(error){toast('Error: '+error.message,'bad');return;}toast('Match deleted.','ok');allMAT=allMAT.filter(r=>!ids.includes(r.id));buildDateTabs();renderMAT();};
+        mb.appendChild(delB);dd.appendChild(mb);
+      }
+    });
+    c.appendChild(dd);
+  });
+}
+
+// RESET
+function showC(t){pReset=t;document.getElementById('cfb').classList.add('sh');document.getElementById('cfi').value='';document.getElementById('cfi').focus();}
+function hideC(){document.getElementById('cfb').classList.remove('sh');pReset=null;}
+async function execR(){
+  if(document.getElementById('cfi').value.trim()!=='CONFIRM'){toast('Type CONFIRM exactly.','warn');return;}
+  const btn=document.getElementById('cfbtn');btn.innerHTML='<span class="spin"></span>';btn.disabled=true;
+  let err=null;
+  if(pReset==='entries'){const r=await db.from('merit_entries').delete().neq('id',0);err=r.error;}
+  else if(pReset==='quotas'){const r=await db.from('cadets').update({quota_dr:0,quota_ed:0}).neq('id',0);err=r.error;}
+  btn.textContent='Execute Reset';btn.disabled=false;
+  if(err){toast('Error: '+err.message,'bad');return;}
+  toast(pReset==='entries'?'All entries deleted.':'Quotas reset.','ok');hideC();
+}
+
+// IMPORT
+function handleX(inp){
+  const file=inp.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const wb=XLSX.read(e.target.result,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+    impD=[];
+    rows.forEach(row=>{
+      const team=row['Team']||row['team']||row['TEAM']||'';
+      const name=(row['Name']||row['name']||row['NAME']||'').toString().trim().toUpperCase();
+      const batchRaw=row['Batch']||row['batch']||row['BATCH']||'';
+      const batch=parseInt(batchRaw)||null;
+      if(name)impD.push({name,team:parseInt(team)||null,batch});
+    });
+    document.getElementById('ipt').textContent=`${impD.length} cadets found`;
+    document.getElementById('ipr').innerHTML=impD.slice(0,8).map(r=>`<div>${r.name} — Team ${r.team||'?'} — Batch ${r.batch||'?'}</div>`).join('')+(impD.length>8?`<div>…and ${impD.length-8} more</div>`:'');
+    document.getElementById('iprev').style.display='block';document.getElementById('ib').style.display='block';
+  };reader.readAsArrayBuffer(file);
+}
+async function execI(){
+  if(!impD.length){toast('No data.','warn');return;}
+  const btn=document.getElementById('ib');btn.innerHTML='<span class="spin"></span> Importing…';btn.disabled=true;
+  let add=0,sk=0,err_other=0;
+  for(const c of impD){
+    const {error}=await db.from('cadets').insert([{name:c.name,team:c.team,batch:c.batch,quota_dr:0,quota_ed:0}]);
+    if(error&&error.code==='23505')sk++;
+    else if(!error)add++;
+    else err_other++;
+  }
+  btn.textContent='Import Cadets';btn.disabled=false;
+  toast(`Imported ${add}. Skipped ${sk} existing.${err_other?' Errors: '+err_other:''}`,'ok');
+  impD=[];document.getElementById('iprev').style.display='none';btn.style.display='none';document.getElementById('xi').value='';
+  if(typeof loadMasterList==='function'&&typeof adraw!=='undefined'&&adraw==='master')loadMasterList();
+}
+const fd2=document.getElementById('fd');
+fd2.addEventListener('dragover',e=>{e.preventDefault();fd2.style.borderColor='var(--acc)';});
+fd2.addEventListener('dragleave',()=>{fd2.style.borderColor='';});
+fd2.addEventListener('drop',e=>{e.preventDefault();fd2.style.borderColor='';const f=e.dataTransfer.files[0];if(f){const dt=new DataTransfer();dt.items.add(f);document.getElementById('xi').files=dt.files;handleX(document.getElementById('xi'));}});
+
+// ADS
+async function loadAds(){
+  const {data}=await db.from('site_settings').select('value').eq('key','ads_enabled').single();
+  const on=data?.value==='true';
+  document.getElementById('adtog').checked=on;
+  document.getElementById('adst').textContent=on?'Ads are ON':'Ads are OFF';
+  document.getElementById('adst').style.color=on?'var(--ok)':'var(--tx3)';
+}
+async function togAds(on){
+  await db.from('site_settings').update({value:on?'true':'false',updated_at:new Date().toISOString()}).eq('key','ads_enabled');
+  document.getElementById('adst').textContent=on?'Ads are ON':'Ads are OFF';
+  document.getElementById('adst').style.color=on?'var(--ok)':'var(--tx3)';
+  toast(on?'Ads enabled.':'Ads disabled.','ok');
+}
+
+var _HK='fleet_hidden_v1';
+function loadHiddenRows(){
+  try{var s=localStorage.getItem(_HK);hiddenRows=s?new Set(JSON.parse(s)):new Set();}
+  catch(ex){hiddenRows=new Set();}
+}
+function saveHiddenRows(){
+  try{localStorage.setItem(_HK,JSON.stringify([...hiddenRows]));}catch(ex){}
+}
+function toggleHide(id,hide){
+  if(hide)hiddenRows.add(id); else hiddenRows.delete(id);
+  saveHiddenRows();
+  var tr=document.getElementById('er'+id);
+  if(tr){if(hide)tr.classList.add('row-hi'); else tr.classList.remove('row-hi');}
+  toast(hide?'Entry hidden from lookup.':'Entry visible in lookup.','ok');
+}
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  const c={ok:'#22c55e',bad:'#ef4444',warn:'#f59e0b'};
+  t.textContent=msg;t.style.background=c[type]||c.ok;t.style.display='block';
+  setTimeout(()=>{t.style.display='none';},3000);
+}
+
+// ── MASTER LIST ───────────────────────────────────────────────
+var allCadets=[];
+async function loadMasterList(){
+  var grid=document.getElementById('masterGrid');
+  grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--teal)"></span> Loading…</div>';
+  var {data}=await db.from('cadets').select('id,name,team,batch').order('name');
+  allCadets=data||[];
+  renderMasterList();
+}
+function renderMasterList(){
+  var grid=document.getElementById('masterGrid');
+  grid.innerHTML='';
+  var batches=[2023,2024,2025];
+  var batchColors={2023:'batch-23',2024:'batch-24',2025:'batch-25'};
+  var addColors={2023:'var(--acc)',2024:'var(--ok)',2025:'var(--pur)'};
+  batches.forEach(function(yr){
+    var members=allCadets.filter(function(c){return c.batch===yr;}).sort(function(a,b){return a.name.localeCompare(b.name);});
+    var card=document.createElement('div');
+    card.className='batch-card';
+    var hdr=document.createElement('div');
+    hdr.className='batch-hdr '+batchColors[yr];
+    hdr.innerHTML='<span>Batch '+yr+'</span><span style="font-size:12px;font-weight:400">'+members.length+' cadets</span>';
+    var list=document.createElement('div');
+    list.className='batch-list';
+    members.forEach(function(c){
+      var row=document.createElement('div');
+      row.className='batch-item';
+      row.innerHTML='<span class="batch-team">T'+c.team+'</span><span class="batch-name">'+c.name+'</span>';
+      var del=document.createElement('button');
+      del.className='batch-del';
+      del.textContent='×';
+      del.title='Remove cadet (deletes all their entries)';
+      del.onclick=(function(cid,cname){
+        return function(){
+          if(!confirm('Remove '+cname+' and ALL their merit entries? This cannot be undone.'))return;
+          deleteCadet(cid,cname);
+        };
+      })(c.id,c.name);
+      row.appendChild(del);
+      list.appendChild(row);
+    });
+    var addRow=document.createElement('div');
+    addRow.className='add-cadet-row';
+    addRow.innerHTML=
+      '<input class="add-cadet-inp" id="addName'+yr+'" placeholder="LAST, FIRST MI.">'+
+      '<select class="team-sel" id="addTeam'+yr+'">'+
+      [1,2,3,4,5,6,7,8].map(function(t){return '<option>'+t+'</option>';}).join('')+
+      '</select>'+
+      '<button class="add-cadet-btn" style="background:'+addColors[yr]+';color:#fff" onclick="addCadet('+yr+')">Add</button>';
+    card.appendChild(hdr);
+    card.appendChild(list);
+    card.appendChild(addRow);
+    grid.appendChild(card);
+  });
+}
+async function addCadet(yr){
+  var nameInp=document.getElementById('addName'+yr);
+  var teamInp=document.getElementById('addTeam'+yr);
+  var name=nameInp.value.trim().toUpperCase();
+  var team=parseInt(teamInp.value)||1;
+  if(!name){toast('Enter a name.','warn');return;}
+  var exists=allCadets.find(function(c){return c.name.toUpperCase()===name;});
+  if(exists){toast('"'+name+'" already exists.','warn');return;}
+  var {error}=await db.from('cadets').insert([{name:name,team:team,batch:yr,quota_dr:0,quota_ed:0}]);
+  if(error){toast('Error: '+error.message,'bad');return;}
+  nameInp.value='';
+  toast(name+' added to Batch '+yr+'.','ok');
+  loadMasterList();
+}
+async function deleteCadet(id,name){
+  var r1=await db.from('merit_entries').delete().ilike('cadet_name',name);
+  if(r1.error){toast('Error deleting entries: '+r1.error.message,'bad');return;}
+  var r2=await db.from('cadets').delete().eq('id',id);
+  if(r2.error){toast('Error deleting cadet: '+r2.error.message,'bad');return;}
+  toast(name+' and all their entries removed.','ok');
+  allCadets=allCadets.filter(function(c){return c.id!==id;});
+  renderMasterList();
+}
+
+// ── SUMMARY ───────────────────────────────────────────────────
+async function loadSummary(){
+  var grid=document.getElementById('summaryGrid');
+  grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--warn)"></span> Loading…</div>';
+  var [{data:sums},{data:cads}]=await Promise.all([
+    db.from('cadet_summary').select('name,net_merit'),
+    db.from('cadets').select('name,batch')
+  ]);
+  var batchMap={};
+  (cads||[]).forEach(function(c){batchMap[c.name.toUpperCase()]=c.batch;});
+  var byBatch={2023:[],2024:[],2025:[],null:[]};
+  (sums||[]).forEach(function(s){
+    var b=batchMap[s.name.toUpperCase()]||null;
+    if(byBatch[b])byBatch[b].push(s); else byBatch[null].push(s);
+  });
+  grid.innerHTML='';
+  var batchColors={2023:'batch-23',2024:'batch-24',2025:'batch-25'};
+  [2023,2024,2025].forEach(function(yr){
+    var members=(byBatch[yr]||[]).sort(function(a,b){return a.name.localeCompare(b.name);});
+    var card=document.createElement('div');
+    card.className='sum-card';
+    var hdr=document.createElement('div');
+    hdr.className='sum-hdr '+batchColors[yr];
+    hdr.innerHTML='Batch '+yr+' <span style="font-weight:400;font-size:12px">('+members.length+')</span>';
+    var list=document.createElement('div');
+    list.className='sum-list';
+    var hrow=document.createElement('div');
+    hrow.className='sum-row';
+    hrow.innerHTML='<span class="sum-name" style="color:var(--tx3);font-size:10px;text-transform:uppercase;letter-spacing:.06em">Name</span><span style="color:var(--tx3);font-size:10px;text-transform:uppercase;letter-spacing:.06em">Net Merits</span>';
+    list.appendChild(hrow);
+    members.forEach(function(s){
+      var row=document.createElement('div');
+      row.className='sum-row';
+      var pts=s.net_merit!=null?s.net_merit:0;
+      row.innerHTML='<span class="sum-name" title="'+s.name+'">'+s.name+'</span><span class="sum-pts'+(pts<0?' neg':'')+'">'+pts+'</span>';
+      list.appendChild(row);
+    });
+    card.appendChild(hdr);
+    card.appendChild(list);
+    grid.appendChild(card);
+  });
+}
+
+// ── FEEDBACK ───────────────────────────────────────────────────
+async function loadFeedback(){
+  var c=document.getElementById('feedbackList');
+  c.innerHTML='<div style="text-align:center;padding:24px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--warn)"></span> Loading…</div>';
+  var {data}=await db.from('reports').select('*').order('created_at',{ascending:false});
+  c.innerHTML='';
+  if(!data||!data.length){c.innerHTML='<div style="text-align:center;padding:32px;color:var(--tx3)">No feedback yet.</div>';return;}
+  data.forEach(function(r){
+    var dt=r.created_at?new Date(r.created_at).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}):'—';
+    var row=document.createElement('div');
+    row.style.cssText='background:var(--sur2);border:1px solid var(--bor2);border-radius:10px;padding:14px';
+    row.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;color:var(--tx)">'+(r.reporter_name||'Anonymous')+'</span><span style="font-size:11px;color:var(--tx3)">'+dt+'</span></div><div style="font-size:13px;color:var(--tx2);line-height:1.5">'+(r.comment||'')+'</div><button style="margin-top:10px;padding:4px 10px;border-radius:6px;border:none;background:rgba(248,113,113,.1);color:var(--bad);font-size:11px;cursor:pointer" onclick="deleteFeedback('+r.id+',this)">Delete</button>';
+    c.appendChild(row);
+  });
+}
+async function deleteFeedback(id,btn){
+  if(!confirm('Delete this feedback?'))return;
+  btn.disabled=true;btn.textContent='Deleting…';
+  var {error}=await db.from('reports').delete().eq('id',id);
+  if(error){toast('Error: '+error.message,'bad');btn.disabled=false;btn.textContent='Delete';return;}
+  btn.closest('div[style*="border-radius"]').remove();
+  toast('Deleted.','ok');
+}
+
+// ── MEMOS ───────────────────────────────────────────────────
+let pendingMemoFile=null;
+async function handleMemoUpload(inp){
+  if(!inp.files[0])return;
+  pendingMemoFile=inp.files[0];
+  toast('File selected: '+pendingMemoFile.name,'ok');
+}
+async function addMemo(){
+  var title=document.getElementById('memoTitle').value.trim();
+  if(!title||!pendingMemoFile){toast('Enter title and select a file.','warn');return;}
+  var btn=event.target;
+  btn.disabled=true;btn.textContent='Uploading…';
+  try {
+    var ext=pendingMemoFile.name.split('.').pop();
+    var path='memos/'+Date.now()+'.'+ext;
+    var {data:upData, error:upErr}=await db.storage.from('files').upload(path,pendingMemoFile,{cacheControl:'3600',upsert:false});
+    if(upErr){
+      toast('Upload error: '+upErr.message,'bad');
+      btn.disabled=false;btn.textContent='📎 Upload Memo';return;
+    }
+    var {data:urlData}=db.storage.from('files').getPublicUrl(path);
+    var fileUrl=urlData.publicUrl;
+    var {error}=await db.from('memos').insert([{title,file_url:fileUrl}]);
+    if(error){toast('DB error: '+error.message,'bad');btn.disabled=false;btn.textContent='📎 Upload Memo';return;}
+    document.getElementById('memoTitle').value='';
+    pendingMemoFile=null;
+    document.getElementById('memoFile').value='';
+    toast('Memo uploaded!','ok');
+    loadMemosAdmin();
+  } catch(e){
+    toast('Error: '+e.message,'bad');
+    console.log('Exception:', e);
+  }
+  btn.disabled=false;btn.textContent='📎 Upload Memo';
+}
+async function loadMemosAdmin(){
+  var c=document.getElementById('memoListAdmin');
+  c.innerHTML='<div style="text-align:center;padding:16px;color:var(--tx3)"><span class="spin"></span></div>';
+  var {data}=await db.from('memos').select('*').order('created_at',{ascending:false});
+  c.innerHTML='';
+  if(!data||!data.length){c.innerHTML='<div style="text-align:center;padding:24px;color:var(--tx3)">No memos yet.</div>';return;}
+  data.forEach(function(m){
+    var dt=m.created_at?new Date(m.created_at).toLocaleDateString('en-PH',{month:'short',day:'numeric'}):'—';
+    var row=document.createElement('div');
+    row.style.cssText='background:var(--sur2);border:1px solid var(--bor2);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center';
+    row.innerHTML='<div><div style="font-weight:600;font-size:13px">'+m.title+'</div><div style="font-size:11px;color:var(--tx3)">'+dt+'</div></div><button style="padding:4px 10px;border-radius:6px;border:none;background:rgba(248,113,113,.1);color:var(--bad);font-size:11px;cursor:pointer" onclick="deleteMemo('+m.id+',this)">Delete</button>';
+    c.appendChild(row);
+  });
+}
+async function deleteMemo(id,btn){
+  if(!confirm('Delete this memo?'))return;
+  btn.disabled=true;
+  var {error}=await db.from('memos').delete().eq('id',id);
+  if(error){toast('Error: '+error.message,'bad');btn.disabled=false;return;}
+  btn.closest('div[style*="border-radius"]').remove();
+  toast('Deleted.','ok');
+}
+
+// ── ORG CHART ───────────────────────────────────────────────────
+let pendingOrgPhoto=null;
+function handleOrgPhoto(inp){
+  if(!inp.files[0])return;
+  pendingOrgPhoto=inp.files[0];
+  toast('Photo selected','ok');
+}
+async function addNewOrgCat(){
+  var newCat = document.getElementById('newOrgCat').value.trim();
+  if(!newCat){toast('Enter category name','warn');return;}
+  var sel = document.getElementById('orgCat');
+  // Check if exists in dropdown
+  for(var i=0;i<sel.options.length;i++){
+    if(sel.options[i].value.toLowerCase() === newCat.toLowerCase()){
+      sel.selectedIndex = i;
+      document.getElementById('newOrgCat').value = '';
+      toast('Category selected','ok');
+      return;
+    }
+  }
+  // Save to database
+  var {error} = await db.from('org_categories').insert([{name:newCat}]);
+  if(error && !error.message.includes('duplicate')){toast('Error: '+error.message,'bad');return;}
+  // Add to dropdown
+  var opt = document.createElement('option');
+  opt.value = newCat;
+  opt.textContent = newCat;
+  sel.appendChild(opt);
+  sel.selectedIndex = sel.options.length - 1;
+  document.getElementById('newOrgCat').value = '';
+  toast('Category saved!','ok');
+}
+
+var orgNameTimeout = null;
+function showOrgNameSug(){
+  clearTimeout(orgNameTimeout);
+  orgNameTimeout = setTimeout(loadOrgNameSug, 200);
+}
+var orgNameCache = null;
+async function loadOrgNameSug(){
+  var inp = document.getElementById('orgName').value.toLowerCase();
+  var box = document.getElementById('orgNameSug');
+  if(!inp){box.style.display='none';return;}
+  if(!orgNameCache){
+    var res = await db.from('cadets').select('name');
+    orgNameCache = (res.data || []).map(r => r.name);
+  }
+  var matches = orgNameCache.filter(n => n.toLowerCase().includes(inp)).slice(0,6);
+  if(!matches.length){box.style.display='none';return;}
+  box.innerHTML = matches.map(n => '<div onclick="selectOrgName(\''+n.replace(/'/g,"\\'")+'\')" style="padding:10px;cursor:pointer;color:var(--tx);border-bottom:1px solid var(--bor)">'+n+'</div>').join('');
+  box.style.display = 'block';
+}
+function selectOrgName(name){
+  document.getElementById('orgName').value = name;
+  document.getElementById('orgNameSug').style.display = 'none';
+}
+
+// Category Manager Modal
+var categoryManagerOpen = false;
+function openCategoryManager(){
+  document.getElementById('categoryManagerModal').style.display = 'flex';
+  categoryManagerOpen = true;
+  loadCategoryManager();
+}
+function closeCategoryManager(){
+  document.getElementById('categoryManagerModal').style.display = 'none';
+  categoryManagerOpen = false;
+}
+async function loadCategoryManager(){
+  var list = document.getElementById('categoryList');
+  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx2)">Loading...</div>';
+  
+  var defaultCats = [
+    {id:1,name:'HEAD',order_index:1},
+    {id:2,name:'MANAGEMENT',order_index:2},
+    {id:3,name:'EXECUTIVE OFFICER',order_index:3},
+    {id:4,name:'FUNCTIONS',order_index:4}
+  ];
+  
+  var cats = defaultCats;
+  try{
+    var result = await db.from('org_categories').select('*').order('order_index',{ascending:true});
+    if(result.data && result.data.length > 0){
+      cats = result.data;
+    }
+  }catch(e){}
+  
+  // Parse main vs sub-categories
+  var mainCats = [];
+  var subCats = [];
+  cats.forEach(function(c){
+    if(c.name && c.name.indexOf(' > ') > 0){
+      var parts = c.name.split(' > ');
+      subCats.push({id:c.id,name:parts[1],parent:parts[0],order:c.order});
+    }else{
+      mainCats.push(c);
+    }
+  });
+  
+  var html = '';
+  mainCats.forEach(function(c,idx){
+    var catSubs = subCats.filter(function(s){return s.parent === c.name;});
+    html += '<div class="cat-main" data-id="'+c.id+'">'+
+      '<div class="cat-item" data-id="'+c.id+'" data-name="'+c.name+'" style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(91,141,238,0.1))">'+
+        '<div style="display:flex;align-items:center;gap:10px;flex:1">'+
+          '<span style="font-weight:700;color:var(--tx);font-size:15px">'+c.name+'</span>'+
+        '</div>'+
+        '<div style="display:flex;gap:4px">'+
+          '<button onclick="moveCatUp('+c.id+')" title="Move Up" style="padding:4px 8px;background:var(--sur2);border:1px solid var(--bor);border-radius:4px;color:var(--tx2);cursor:pointer;font-size:12px">↑</button>'+
+          '<button onclick="moveCatDown('+c.id+')" title="Move Down" style="padding:4px 8px;background:var(--sur2);border:1px solid var(--bor);border-radius:4px;color:var(--tx2);cursor:pointer;font-size:12px">↓</button>'+
+          '<button onclick="addSubCategory('+c.id+',\''+c.name.replace(/'/g,"\\'")+'\')" style="padding:4px 10px;background:var(--acc);border:none;border-radius:4px;color:#fff;cursor:pointer;font-size:11px">+ Sub</button>'+
+          '<button class="edit-cat-btn" data-id="'+c.id+'" data-name="'+c.name+'" style="padding:4px 10px;background:var(--sur2);border:1px solid var(--bor);border-radius:4px;color:var(--tx2);cursor:pointer;font-size:11px">✏️</button>'+
+          '<button class="del-cat-btn" data-id="'+c.id+'" data-name="'+c.name+'" style="padding:4px 10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:4px;color:var(--bad);cursor:pointer;font-size:11px">🗑️</button>'+
+        '</div>'+
+      '</div>';
+    
+    if(catSubs.length > 0){
+      html += '<div class="sub-cats" style="margin-left:30px;margin-top:8px;margin-bottom:16px">';
+      catSubs.forEach(function(s){
+        html += '<div class="cat-item cat-sub" data-id="'+s.id+'" data-name="'+s.name+'" data-parent="'+s.parent+'" style="border-left:3px solid var(--acc)">'+
+          '<div style="display:flex;align-items:center;gap:10px;flex:1">'+
+            '<span style="font-weight:600;color:var(--tx)">'+s.name+'</span>'+
+          '</div>'+
+          '<div style="display:flex;gap:6px">'+
+            '<button class="edit-cat-btn" data-id="'+s.id+'" data-name="'+s.name+'" style="padding:4px 10px;background:var(--sur2);border:1px solid var(--bor);border-radius:4px;color:var(--tx2);cursor:pointer;font-size:11px">✏️</button>'+
+            '<button class="del-cat-btn" data-id="'+s.id+'" data-name="'+s.name+'" style="padding:4px 10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:4px;color:var(--bad);cursor:pointer;font-size:11px">🗑️</button>'+
+          '</div>'+
+        '</div>';
+      });
+      html += '</div>';
+    }else{
+      html += '<div class="sub-cats" style="margin-left:30px;margin-top:8px;margin-bottom:16px;display:none"></div>';
+    }
+    html += '</div>';
+  });
+  
+  list.innerHTML = html;
+  
+  // Add event listeners for delete and edit buttons
+  list.querySelectorAll('.del-cat-btn').forEach(function(btn){
+    btn.onclick = function(){
+      deleteCategory(this.dataset.id, this.dataset.name);
+    };
+  });
+  list.querySelectorAll('.edit-cat-btn').forEach(function(btn){
+    btn.onclick = function(){
+      editCategory(this.dataset.id, this.dataset.name);
+    };
+  });
+  
+  initCategoryDragDrop();
+}
+
+async function addSubCategory(parentId, parentName){
+  var name = prompt('Add sub-category under ' + parentName + ':');
+  if(!name || !name.trim()) return;
+  name = name.trim().toUpperCase();
+  var fullName = parentName + ' > ' + name;
+  saveOrgHistory();
+  try{
+    await db.from('org_categories').insert([{name:fullName}]);
+  }catch(e){}
+  loadCategoryManager();
+  refreshOrgCatDropdown();
+  toast('Sub-category added!','ok');
+}
+
+// Simple reorder with buttons - save to database
+function moveCatUp(id){
+  var items = document.querySelectorAll('.cat-main');
+  for(var i=1;i<items.length;i++){
+    if(items[i].dataset.id == id && items[i-1]){
+      items[i].parentNode.insertBefore(items[i], items[i-1]);
+      saveCatOrderDB();
+      break;
+    }
+  }
+}
+function moveCatDown(id){
+  var items = document.querySelectorAll('.cat-main');
+  for(var i=0;i<items.length-1;i++){
+    if(items[i].dataset.id == id && items[i+1]){
+      items[i].parentNode.insertBefore(items[i+1], items[i]);
+      saveCatOrderDB();
+      break;
+    }
+  }
+}
+async function saveCatOrderDB(){
+  var items = document.querySelectorAll('.cat-main');
+  var order = [];
+  items.forEach(function(it,i){
+    order.push({id:it.dataset.id, name:it.dataset.name, order:i+1});
+  });
+  
+  // Try to save order to database using order_index
+  try{
+    for(var j=0;j<order.length;j++){
+      await db.from('org_categories').update({order_index:order[j].order}).eq('id',order[j].id);
+    }
+  }catch(e){}  
+  
+  // Also save to sessionStorage as backup for this session
+  sessionStorage.setItem('cat_order',JSON.stringify(order));
+  
+  loadCategoryManager();
+  refreshOrgCatDropdown();
+  toast('Order updated!','ok');
+}
+async function addNewCategoryFromModal(){
+  var name = prompt('Enter new category name:');
+  if(!name || !name.trim()) return;
+  name = name.trim().toUpperCase();
+  saveOrgHistory();
+  try{
+    await db.from('org_categories').insert([{name:name}]);
+  }catch(e){}
+  loadCategoryManager();
+  refreshOrgCatDropdown();
+  toast('Category added!','ok');
+}
+async function editCategory(id, oldName){
+  var newName = prompt('Edit category name:', oldName);
+  if(!newName || !newName.trim() || newName.trim() === oldName) return;
+  newName = newName.trim().toUpperCase();
+  saveOrgHistory();
+  try{
+    await db.from('org_categories').update({name:newName}).eq('id',id);
+  }catch(e){}
+  loadCategoryManager();
+  refreshOrgCatDropdown();
+  toast('Category updated!','ok');
+}
+async function deleteCategory(id, name){
+  var msg = 'Delete category "'+name+'"?';
+  if(name && name.indexOf(' > ') > 0){
+    msg += '\nThis will also delete this sub-category from the system.';
+  }
+  if(!confirm(msg)) return;
+  saveOrgHistory();
+  try{
+    await db.from('org_categories').delete().eq('id',id);
+  }catch(e){}
+  loadCategoryManager();
+  refreshOrgCatDropdown();
+  toast('Category deleted','ok');
+}
+async function refreshOrgCatDropdown(){
+  var sel = document.getElementById('orgCat');
+  var current = sel.value;
+  sel.innerHTML = '<option value="">Category...</option>';
+  var defaultCats = ['HEAD','MANAGEMENT','EXECUTIVE OFFICER','FUNCTIONS'];
+  try{
+    var result = await db.from('org_categories').select('*').order('order_index',{ascending:true});
+    var cats = result.data && result.data.length > 0 ? result.data : null;
+    if(!cats) throw new Error('no cats');
+    if(cats && cats.length > 0){
+      var mainCats = [];
+      var subCats = [];
+      cats.forEach(function(c){
+        if(c.name && c.name.indexOf(' > ') > 0){
+          var parts = c.name.split(' > ');
+          subCats.push({name:c.name,subName:parts[1],parent:parts[0]});
+        }else{
+          mainCats.push(c);
+        }
+      });
+      
+      mainCats.forEach(function(c){
+        var opt = document.createElement('option');
+        opt.value = c.name;
+        opt.textContent = c.name;
+        sel.appendChild(opt);
+        var parentSubs = subCats.filter(function(s){return s.parent === c.name;});
+        parentSubs.forEach(function(s){
+          var subOpt = document.createElement('option');
+          subOpt.value = s.name;
+          subOpt.textContent = '  ↳ ' + s.subName;
+          sel.appendChild(subOpt);
+        });
+      });
+    }else{
+      throw new Error('no cats');
+    }
+  }catch(e){
+    defaultCats.forEach(function(c){
+      var opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      sel.appendChild(opt);
+    });
+  }
+  sel.value = current;
+}
+
+// ── PREMIUM CANVAS ORG CHART ─────────────────────────────────
+var orgZoom = 1;
+var orgPanX = 0, orgPanY = 0;
+var orgHistory = [];
+var orgHistoryIndex = -1;
+var currentEditingId = null;
+var orgDragData = null;
+var orgIsPanning = false;
+var orgPanStart = null;
+var orgShowMinimap = false;
+var orgMembers = [];
+var orgCategories = [];
+var orgConnectMode = false;
+var orgConnectSource = null;
+var orgRelations = [];
+
+// ── CANVAS DRAG (free-form) ────────────────────────────────
+function initOrgCanvasDrag(){
+  document.addEventListener('mousedown', function(e){
+    var card = e.target.closest('.org-member-card, .org-cat-card');
+    
+    if(card && !e.target.closest('button')){
+      e.preventDefault();
+      var canvas = document.getElementById('orgListAdmin');
+      var crect = canvas.getBoundingClientRect();
+      orgDragData = {
+        id: card.dataset.id,
+        card: card,
+        startX: parseInt(card.style.left) || 0,
+        startY: parseInt(card.style.top) || 0,
+        offX: (e.clientX - crect.left) / orgZoom,
+        offY: (e.clientY - crect.top) / orgZoom,
+        moved: false
+      };
+      card.style.cursor = 'grabbing';
+      card.style.zIndex = 999;
+      card.style.transition = 'none';
+      card.classList.add('org-dragging');
+      return;
+    }
+    
+    // Canvas panning (click on empty space)
+    if(!e.target.closest('button') && !e.target.closest('.org-member-card') && !e.target.closest('.org-cat-card')){
+      if(orgConnectMode && orgConnectSource){
+        document.querySelectorAll('.org-member-card, .org-cat-card').forEach(function(c){c.style.outline='';});
+        orgConnectSource = null;
+        toast('Connection cancelled','warn');
+      } else {
+        orgIsPanning = true;
+        orgPanStart = {x: e.clientX - orgPanX, y: e.clientY - orgPanY};
+        document.getElementById('orgCanvasContainer').style.cursor = 'grabbing';
+      }
+    }
+  });
+
+  document.addEventListener('mousemove', function(e){
+    if(orgDragData){
+      var canvas = document.getElementById('orgListAdmin');
+      var crect = canvas.getBoundingClientRect();
+      orgDragData.moved = true;
+      var mx = (e.clientX - crect.left) / orgZoom - orgDragData.offX + orgDragData.startX;
+      var my = (e.clientY - crect.top) / orgZoom - orgDragData.offY + orgDragData.startY;
+      orgDragData.card.style.left = Math.round(mx) + 'px';
+      orgDragData.card.style.top = Math.round(my) + 'px';
+      orgDragData.card.dataset.x = Math.round(mx);
+      orgDragData.card.dataset.y = Math.round(my);
+      return;
+    }
+    if(orgIsPanning && orgPanStart){
+      orgPanX = e.clientX - orgPanStart.x;
+      orgPanY = e.clientY - orgPanStart.y;
+      document.getElementById('orgCanvas').style.transform = 'translate('+orgPanX+'px,'+orgPanY+'px) scale('+orgZoom+')';
+    }
+  });
+
+  document.addEventListener('mouseup', function(e){
+    if(orgDragData){
+      orgDragData.card.style.cursor = 'grab';
+      orgDragData.card.style.zIndex = '';
+      orgDragData.card.style.transition = '';
+      orgDragData.card.classList.remove('org-dragging');
+      if(orgDragData.moved){
+        orgDragData.card.classList.add('org-just-dragged');
+        var self = orgDragData.card;
+        setTimeout(function(){ self.classList.remove('org-just-dragged'); }, 150);
+        var x = parseInt(orgDragData.card.style.left) || 0;
+        var y = parseInt(orgDragData.card.style.top) || 0;
+        var positions = {};
+        try{ var r = localStorage.getItem('org_positions_v1'); if(r) positions = JSON.parse(r); }catch(ex){}
+        positions[orgDragData.id] = {x:x, y:y};
+        try{ localStorage.setItem('org_positions_v1', JSON.stringify(positions)); }catch(ex){}
+        renderOrgConnectors();
+        updateMinimap();
+      }
+      orgDragData = null;
+    }
+    if(orgIsPanning){
+      orgIsPanning = false;
+      document.getElementById('orgCanvasContainer').style.cursor = 'grab';
+    }
+  });
+
+  // Mouse wheel zoom
+  document.getElementById('orgCanvasContainer').addEventListener('wheel', function(e){
+    if(e.ctrlKey || e.metaKey){
+      e.preventDefault();
+      var delta = e.deltaY > 0 ? -0.08 : 0.08;
+      orgZoom = Math.max(0.25, Math.min(2, orgZoom + delta));
+      applyOrgZoom();
+    }
+  }, {passive:false});
+}
+
+function applyOrgZoom(){
+  var el = document.getElementById('orgCanvas');
+  el.style.transform = 'translate('+orgPanX+'px,'+orgPanY+'px) scale('+orgZoom+')';
+  document.getElementById('orgZoomLevel').textContent = Math.round(orgZoom * 100) + '%';
+  document.getElementById('orgZoomLevel2').textContent = Math.round(orgZoom * 100) + '%';
+}
+
+function orgZoomAdj(delta){
+  orgZoom = Math.max(0.25, Math.min(2, orgZoom + delta));
+  applyOrgZoom();
+}
+
+function resetOrgView(){
+  orgZoom = 1; orgPanX = 0; orgPanY = 0;
+  applyOrgZoom();
+}
+
+// ── LOAD ORG DATA ──────────────────────────────────────────
+async function loadOrgAdmin(){
+  var c = document.getElementById('orgListAdmin');
+  c.innerHTML = '<div style="text-align:center;padding:60px;color:rgba(255,255,255,0.3)"><div class="spin" style="width:28px;height:28px;margin:0 auto 12px;border-color:rgba(139,92,246,0.3)"></div><div style="font-size:13px">Loading organization...</div></div>';
+  
+  await refreshOrgCatDropdown();
+  
+  var [memRes, catRes] = await Promise.all([
+    db.from('org_chart').select('*').order('id',{ascending:true}),
+    db.from('org_categories').select('*').order('order_index')
+  ]);
+  
+  orgMembers = memRes.data || [];
+  orgCategories = catRes.data || [];
+  
+  // Load persisted relationships from DB
+  try{
+    var relRes = await db.from('site_settings').select('value').eq('key','org_connections').maybeSingle();
+    if(relRes.data && relRes.data.value){
+      var parsed = JSON.parse(relRes.data.value);
+      if(Array.isArray(parsed)) orgRelations = parsed;
+    }
+  }catch(e){}
+  
+  saveOrgHistory();
+  
+  // Build canvas
+  c.innerHTML = '';
+  c.style.cssText = 'position:relative;width:5000px;height:5000px';
+  
+  // Render categories (initial positions will be overwritten)
+  orgCategories.forEach(function(cat, i){
+    renderOrgCatTile(c, cat, 0, 0);
+  });
+  
+  // Render members
+  orgMembers.forEach(function(m){
+    renderOrgMemberTile(c, m, 0, 0);
+  });
+  
+  // Try restoring saved positions from localStorage
+  var savedPos = {};
+  try{ var r = localStorage.getItem('org_positions_v1'); if(r) savedPos = JSON.parse(r); }catch(ex){}
+  var savedCount = Object.keys(savedPos).length;
+  var memberCount = orgMembers.length;
+  
+  if(savedCount > 0 && savedCount >= memberCount * 0.5){
+    // Restore saved positions
+    document.querySelectorAll('.org-member-card, .org-cat-card').forEach(function(el){
+      var p = savedPos[el.dataset.id];
+      if(p){ el.style.left=p.x+'px'; el.style.top=p.y+'px'; el.dataset.x=p.x; el.dataset.y=p.y; }
+    });
+    renderOrgConnectors();
+    updateMinimap();
+  } else {
+    // First load or incomplete data — use tree layout
+    autoArrangeTree();
+  }
+  
+  updateOrgFilterDropdown();
+}
+
+function renderOrgCatTile(container, cat, x, y){
+  var colors = ['rgba(139,92,246,0.15)','rgba(6,182,212,0.12)','rgba(168,85,247,0.12)','rgba(34,211,238,0.1)','rgba(99,102,241,0.12)'];
+  var gradIdx = Math.abs(hashStr(cat.name)) % colors.length;
+  var tile = document.createElement('div');
+  tile.className = 'org-cat-card';
+  tile.dataset.id = 'cat_'+cat.name;
+  tile.dataset.x = x; tile.dataset.y = y;
+  tile.style.cssText = 'position:absolute;left:'+x+'px;top:'+y+'px;'+
+    'background:rgba(15,23,42,0.5);backdrop-filter:blur(10px);'+
+    'border:1px solid rgba(139,92,246,0.2);border-radius:16px;padding:10px 18px;'+
+    'cursor:grab;user-select:none;z-index:1;'+
+    'box-shadow:0 4px 24px rgba(0,0,0,0.2);transition:box-shadow 0.2s;'+
+    'display:flex;align-items:center;gap:8px';
+  tile.innerHTML = '<span style="color:'+colors[gradIdx].replace('0.1','0.6')+';font-size:16px">▨</span>'+
+    '<span style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:#e2e8f0;white-space:nowrap">'+cat.name+'</span>';
+  
+  tile.addEventListener('click', function(e){
+    if(tile.classList.contains('org-just-dragged')) return;
+    if(orgConnectMode){
+      var id = tile.dataset.id;
+      if(!orgConnectSource){
+        orgConnectSource = id;
+        tile.style.outline = '2px solid #22d3ee';
+        toast('Now click the target node','warn');
+      } else {
+        document.querySelectorAll('.org-member-card, .org-cat-card').forEach(function(c){c.style.outline='';});
+        orgDoConnect(orgConnectSource, id);
+        orgConnectSource = null;
+      }
+    }
+  });
+  
+  container.appendChild(tile);
+}
+
+function renderOrgMemberTile(container, m, x, y){
+  var photo = m.photo_url || '';
+  var initials = m.name ? m.name.split(' ').map(function(n){return n[0]}).join('').substring(0,2).toUpperCase() : '?';
+  var catColor = getCatColor(m.category);
+  
+  var tile = document.createElement('div');
+  tile.className = 'org-member-card';
+  tile.dataset.id = m.id;
+  tile.dataset.cat = m.category || 'FUNCTIONS';
+  tile.dataset.x = x; tile.dataset.y = y;
+  tile.style.cssText = 'position:absolute;left:'+x+'px;top:'+y+'px;'+
+    'width:160px;background:rgba(15,23,42,0.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);'+
+    'border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:14px 12px 10px;'+
+    'cursor:grab;user-select:none;z-index:2;'+
+    'box-shadow:0 4px 24px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.04);transition:box-shadow 0.2s,border-color 0.2s;'+
+    'display:flex;flex-direction:column;align-items:center';
+  
+  // Hover effects
+  tile.addEventListener('mouseenter', function(){
+    tile.style.borderColor = catColor.replace('0.3','0.5');
+    tile.style.boxShadow = '0 8px 32px rgba(0,0,0,0.4),0 0 20px '+catColor.replace('0.3','0.08');
+  });
+  tile.addEventListener('mouseleave', function(){
+    tile.style.borderColor = 'rgba(255,255,255,0.06)';
+    tile.style.boxShadow = '0 4px 24px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.04)';
+  });
+  
+  var inner = '';
+  
+  // Avatar + status dot
+  inner += '<div style="position:relative;margin-bottom:8px">';
+  if(photo){
+    inner += '<img src="'+photo+'" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid '+catColor.replace('0.3','0.4')+'">';
+  } else {
+    inner += '<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,'+catColor.replace('0.3','0.4')+','+catColor.replace('0.3','0.15')+');display:flex;align-items:center;justify-content:center;color:#e2e8f0;font-size:16px;font-weight:700;border:2px solid '+catColor.replace('0.3','0.3')+'">'+initials+'</div>';
+  }
+  inner += '<div style="position:absolute;bottom:1px;right:1px;width:9px;height:9px;border-radius:50%;background:#22c55e;border:2px solid rgba(15,23,42,0.8)"></div>';
+  inner += '</div>';
+  
+  // Name
+  inner += '<div style="font-weight:600;font-size:11px;color:#e2e8f0;text-align:center;line-height:1.3;margin-bottom:2px;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(m.name || 'Name')+'</div>';
+  
+  // Position
+  inner += '<div style="font-size:9px;color:rgba(148,163,184,0.7);text-align:center;margin-bottom:6px;line-height:1.2">'+(m.position || '')+'</div>';
+  
+  // Department tag
+  inner += '<div style="font-size:7px;padding:2px 8px;background:'+catColor+';border-radius:10px;color:#cbd5e1;display:inline-block;text-transform:uppercase;letter-spacing:0.3px;font-weight:500">'+shortCat(m.category)+'</div>';
+  
+  // Action menu (appears on hover)
+  tile.innerHTML = inner;
+  
+  tile.addEventListener('click', function(e){
+    if(tile.classList.contains('org-just-dragged')) return;
+    if(orgConnectMode){
+      var id = tile.dataset.id;
+      if(!orgConnectSource){
+        orgConnectSource = id;
+        tile.style.outline = '2px solid #22d3ee';
+        toast('Now click the target node','warn');
+      } else {
+        document.querySelectorAll('.org-member-card, .org-cat-card').forEach(function(c){c.style.outline='';});
+        orgDoConnect(orgConnectSource, id);
+        orgConnectSource = null;
+      }
+      return;
+    }
+    openOrgEditPanel(m.id);
+  });
+  
+  // Drag handling (same as cat cards via event delegation)
+  
+  container.appendChild(tile);
+}
+
+function shortCat(cat){
+  if(!cat) return 'FUNCTIONS';
+  var i = cat.indexOf(' > ');
+  return i > 0 ? cat.substring(i + 3) : cat;
+}
+
+function getCatColor(cat){
+  var base = cat;
+  if(base && base.indexOf(' > ') > 0) base = base.split(' > ')[0];
+  var colors = {
+    'HEAD':'rgba(139,92,246,0.3)',
+    'MANAGEMENT':'rgba(6,182,212,0.3)',
+    'EXECUTIVE OFFICER':'rgba(168,85,247,0.3)',
+    'FUNCTIONS':'rgba(34,211,238,0.2)'
+  };
+  return colors[base] || 'rgba(99,102,241,0.3)';
+}
+
+function hashStr(s){
+  var h = 0;
+  for(var i=0;i<s.length;i++){h = ((h<<5)-h)+s.charCodeAt(i); h|=0;}
+  return Math.abs(h);
+}
+
+// ── SVG CONNECTORS ─────────────────────────────────────────
+function renderOrgConnectors(){
+  var svg = document.getElementById('orgConnectors');
+  if(!svg) return;
+  svg.innerHTML = '';
+  
+  var cards = document.querySelectorAll('.org-member-card');
+  var catGroups = {};
+  cards.forEach(function(c){
+    var cat = c.dataset.cat || 'FUNCTIONS';
+    if(!catGroups[cat]) catGroups[cat] = [];
+    catGroups[cat].push(c);
+  });
+  
+  document.querySelectorAll('.org-cat-card').forEach(function(catCard){
+    var catName = catCard.dataset.id.replace('cat_','');
+    var members = catGroups[catName];
+    if(!members || members.length === 0) return;
+    var cx = parseInt(catCard.dataset.x) + catCard.offsetWidth / 2;
+    var cy = parseInt(catCard.dataset.y) + catCard.offsetHeight;
+    
+    members.forEach(function(member){
+      var mx = parseInt(member.dataset.x) + member.offsetWidth / 2;
+      var my = parseInt(member.dataset.y);
+      if(!mx || !my) return;
+      
+      var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      var midY = (cy + my) / 2;
+      var d = 'M'+cx+','+cy+' C'+cx+','+midY+' '+mx+','+midY+' '+mx+','+my;
+      path.setAttribute('d', d);
+      path.setAttribute('stroke', 'rgba(139,92,246,0.15)');
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('class', 'org-connector');
+      svg.appendChild(path);
+    });
+  });
+  
+  // Custom relationship lines
+  var allEls = {};
+  document.querySelectorAll('.org-member-card, .org-cat-card').forEach(function(el){ allEls[el.dataset.id] = el; });
+  orgRelations.forEach(function(r){
+    var src = allEls[r.source], tgt = allEls[r.target];
+    if(!src || !tgt) return;
+    var s = orgGetNodeCenter(src);
+    var e = orgGetNodeCenter(tgt);
+    var midX = (s.x + e.x) / 2;
+    var midY = (s.y + e.y) / 2;
+    var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    var d = 'M'+s.x+','+s.y+' C'+(s.x+50)+','+s.y+' '+(e.x-50)+','+e.y+' '+e.x+','+e.y;
+    path.setAttribute('d', d);
+    path.setAttribute('stroke', 'rgba(34,211,238,0.4)');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '6,4');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('class', 'org-rel-connector');
+    path.style.pointerEvents = 'stroke';
+    path.style.cursor = 'pointer';
+    path.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      var idx = orgRelations.indexOf(r);
+      if(idx > -1){
+        orgRelations.splice(idx, 1);
+        orgSaveRelations();
+        renderOrgConnectors();
+        toast('Connection removed','ok');
+      }
+    });
+    svg.appendChild(path);
+  });
+}
+
+// ── MINI-MAP ───────────────────────────────────────────────
+function toggleMiniMap(){
+  orgShowMinimap = !orgShowMinimap;
+  document.getElementById('orgMiniMap').style.display = orgShowMinimap ? 'block' : 'none';
+  if(orgShowMinimap) updateMinimap();
+}
+
+function updateMinimap(){
+  if(!orgShowMinimap) return;
+  var mm = document.getElementById('orgMiniMapContent');
+  var canvas = document.getElementById('orgListAdmin');
+  var cards = canvas.querySelectorAll('.org-member-card, .org-cat-card');
+  mm.innerHTML = '';
+  cards.forEach(function(c){
+    var dot = document.createElement('div');
+    var x = (parseInt(c.dataset.x) || 0) / 30;
+    var y = (parseInt(c.dataset.y) || 0) / 30;
+    var cls = c.classList.contains('org-cat-card') ? 'org-cat-card' : 'org-member-card';
+    dot.style.cssText = 'position:absolute;left:'+x+'px;top:'+y+'px;'+
+      'width:'+(cls==='org-cat-card'?8:4)+'px;height:'+(cls==='org-cat-card'?4:4)+'px;'+
+      'border-radius:2px;background:'+(cls==='org-cat-card'?'rgba(139,92,246,0.6)':'rgba(255,255,255,0.3)');
+    mm.appendChild(dot);
+  });
+}
+
+// ── TOOLBAR FUNCTIONS ──────────────────────────────────────
+function filterOrgByCat(){
+  var val = document.getElementById('orgFilterCat').value;
+  document.querySelectorAll('.org-member-card').forEach(function(card){
+    if(!val || card.dataset.cat === val){
+      card.style.visibility = 'visible';
+      card.style.opacity = '1';
+    } else {
+      card.style.visibility = 'hidden';
+      card.style.opacity = '0';
+    }
+  });
+}
+
+function updateOrgFilterDropdown(){
+  var sel = document.getElementById('orgFilterCat');
+  if(!sel) return;
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">All</option>';
+  orgCategories.forEach(function(c){
+    var o = document.createElement('option');
+    o.value = c.name; o.textContent = c.name;
+    sel.appendChild(o);
+  });
+  sel.value = cur;
+}
+
+function searchOrgMembers(query){
+  query = query.toLowerCase();
+  document.querySelectorAll('.org-member-card').forEach(function(card){
+    var name = (card.querySelector('div:nth-child(2)')||{}).textContent || '';
+    var pos = (card.querySelector('div:nth-child(3)')||{}).textContent || '';
+    if(!query || name.toLowerCase().includes(query) || pos.toLowerCase().includes(query)){
+      card.style.visibility = 'visible'; card.style.opacity = '1';
+      card.style.borderColor = query ? 'rgba(34,211,238,0.4)' : 'rgba(255,255,255,0.06)';
+    } else {
+      card.style.visibility = 'hidden'; card.style.opacity = '0';
+    }
+  });
+}
+
+function toggleOrgFullscreen(){
+  var el = document.getElementById('dr-org');
+  if (!document.fullscreenElement) {
+    if (el.requestFullscreen) {
+      el.requestFullscreen();
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+}
+
+function toggleOrgConnect(){
+  document.querySelectorAll('.org-member-card, .org-cat-card').forEach(function(c){c.style.outline='';});
+  orgConnectMode = !orgConnectMode;
+  orgConnectSource = null;
+  var btn = document.getElementById('orgConnectBtn');
+  btn.style.background = orgConnectMode ? 'rgba(34,211,238,0.3)' : '';
+  btn.style.borderColor = orgConnectMode ? 'rgba(34,211,238,0.5)' : '';
+  btn.style.color = orgConnectMode ? '#22d3ee' : '';
+  document.getElementById('orgCanvasContainer').style.cursor = orgConnectMode ? 'crosshair' : 'grab';
+  if(!orgConnectMode) toast('Connect mode off','ok');
+  else toast('Click a node to start a connection','warn');
+}
+
+function orgGetNodeCenter(el){
+  var x = parseInt(el.dataset.x) + el.offsetWidth / 2;
+  var y = parseInt(el.dataset.y) + el.offsetHeight / 2;
+  return {x:x, y:y};
+}
+
+async function orgSaveRelations(){
+  try{ await db.from('site_settings').upsert({key:'org_connections', value:JSON.stringify(orgRelations)}, {onConflict:'key'}); }catch(e){}
+}
+
+function orgDoConnect(sourceId, targetId){
+  if(sourceId === targetId) return;
+  for(var i = 0; i < orgRelations.length; i++){
+    if((orgRelations[i].source === sourceId && orgRelations[i].target === targetId) ||
+       (orgRelations[i].source === targetId && orgRelations[i].target === sourceId)) return;
+  }
+  orgRelations.push({source:sourceId, target:targetId});
+  orgSaveRelations();
+  renderOrgConnectors();
+}
+
+function clearOrgRelations(){
+  if(!confirm('Clear all custom connection lines?')) return;
+  orgRelations = [];
+  orgSaveRelations();
+  renderOrgConnectors();
+  toast('Connections cleared','ok');
+}
+
+function expandAllOrg(){
+  document.querySelectorAll('.org-member-card').forEach(function(c){c.style.visibility = 'visible'; c.style.opacity = '1';});
+}
+
+function collapseAllOrg(){
+  document.querySelectorAll('.org-member-card').forEach(function(c){
+    c.style.visibility = c.dataset.cat === 'HEAD' ? 'visible' : 'hidden';
+    c.style.opacity = c.dataset.cat === 'HEAD' ? '1' : '0';
+  });
+}
+
+// ── AUTO-ARRANGE LAYOUTS ───────────────────────────────────
+function autoArrangeTree(){
+  var cats = document.querySelectorAll('.org-cat-card');
+  var members = document.querySelectorAll('.org-member-card');
+  var CARD_W = 175, CARD_H = 130;
+  var H_GAP = 30, V_GAP = 55;
+  var COL_MAX = 5;
+  var START_X = 60, CAT_Y = 30;
+  
+  // Group members by category
+  var catGroups = {};
+  members.forEach(function(m){
+    var c = m.dataset.cat || 'FUNCTIONS';
+    if(!catGroups[c]) catGroups[c] = [];
+    catGroups[c].push(m);
+  });
+  
+  var positions = {};
+  var catPositions = {};
+  var curX = START_X;
+  
+  cats.forEach(function(catEl, ci){
+    var catName = catEl.dataset.id.replace('cat_','');
+    var group = catGroups[catName] || [];
+    var cols = Math.min(group.length, COL_MAX);
+    var rows = Math.ceil(group.length / COL_MAX) || 1;
+    var totalW = cols * (CARD_W + H_GAP) - H_GAP;
+    var totalH = rows * (CARD_H + V_GAP) - V_GAP;
+    
+    // Position category tile centered above its group
+    var catX = curX;
+    var catY = CAT_Y;
+    catEl.style.left = catX + 'px';
+    catEl.style.top = catY + 'px';
+    catEl.dataset.x = catX;
+    catEl.dataset.y = catY;
+    catPositions[catName] = {x: catX, y: catY};
+    positions['cat_'+catName] = {x: catX, y: catY};
+    
+    // Position members under the category
+    group.forEach(function(m, idx){
+      var col = idx % COL_MAX;
+      var row = Math.floor(idx / COL_MAX);
+      var x = catX + col * (CARD_W + H_GAP);
+      var y = catY + 50 + row * (CARD_H + V_GAP);
+      m.style.left = x + 'px';
+      m.style.top = y + 'px';
+      m.dataset.x = x;
+      m.dataset.y = y;
+      positions[m.id] = {x: x, y: y};
+    });
+    
+    // Advance X position for next category
+    curX += totalW + 60;
+  });
+  
+  try{ localStorage.setItem('org_positions_v1', JSON.stringify(positions)); }catch(ex){}
+  renderOrgConnectors();
+  updateMinimap();
+  toast('Tree layout applied','ok');
+}
+
+function autoArrangeCluster(){
+  var positions = {};
+  var cats = document.querySelectorAll('.org-cat-card');
+  var members = document.querySelectorAll('.org-member-card');
+  var cols = Math.ceil(Math.sqrt(cats.length || 1));
+  
+  cats.forEach(function(c, i){
+    var col = i % cols;
+    var row = Math.floor(i / cols);
+    var x = 60 + col * 500;
+    var y = 40 + row * 500;
+    c.style.left = x+'px'; c.style.top = y+'px';
+    c.dataset.x = x; c.dataset.y = y;
+    positions[c.dataset.id] = {x:x, y:y};
+  });
+  
+  var catIdx = {};
+  members.forEach(function(m){
+    var cat = m.dataset.cat || 'FUNCTIONS';
+    var catEl = document.querySelector('.org-cat-card[data-id="cat_'+cat+'"]');
+    var cx = catEl ? parseInt(catEl.dataset.x) + 30 : 60;
+    var cy = catEl ? parseInt(catEl.dataset.y) + 45 : 100;
+    if(!catIdx[cat]) catIdx[cat] = 0;
+    var col = catIdx[cat] % 3;
+    var row = Math.floor(catIdx[cat] / 3);
+    catIdx[cat]++;
+    var x = cx + col * 175;
+    var y = cy + row * 175;
+    m.style.left = x+'px'; m.style.top = y+'px';
+    m.dataset.x = x; m.dataset.y = y;
+    positions[m.id] = {x:x, y:y};
+  });
+  
+  try{ localStorage.setItem('org_positions_v1', JSON.stringify(positions)); }catch(ex){}
+  renderOrgConnectors();
+  updateMinimap();
+  toast('Cluster layout applied','ok');
+}
+
+function autoArrangeRadial(){
+  var positions = {};
+  var cats = document.querySelectorAll('.org-cat-card');
+  var members = document.querySelectorAll('.org-member-card');
+  var cx = 1000, cy = 1000;
+  var catRadius = 300;
+  var memRadius = 120;
+  
+  cats.forEach(function(c, i){
+    var angle = (i / cats.length) * Math.PI * 2 - Math.PI/2;
+    var x = cx + Math.cos(angle) * catRadius;
+    var y = cy + Math.sin(angle) * catRadius;
+    c.style.left = Math.round(x)+'px'; c.style.top = Math.round(y)+'px';
+    c.dataset.x = Math.round(x); c.dataset.y = Math.round(y);
+    positions[c.dataset.id] = {x:Math.round(x), y:Math.round(y)};
+  });
+  
+  var catIdx = {};
+  members.forEach(function(m){
+    var cat = m.dataset.cat || 'FUNCTIONS';
+    var catEl = document.querySelector('.org-cat-card[data-id="cat_'+cat+'"]');
+    var catAngle = catEl ? Math.atan2((parseInt(catEl.dataset.y)||0)-cy, (parseInt(catEl.dataset.x)||0)-cx) : 0;
+    if(!catIdx[cat]) catIdx[cat] = 0;
+    var angleOffset = ((catIdx[cat] - 1) * 0.4) || 0;
+    var r = memRadius + catIdx[cat] * 35;
+    catIdx[cat]++;
+    var x = cx + Math.cos(catAngle + angleOffset) * r;
+    var y = cy + Math.sin(catAngle + angleOffset) * r;
+    m.style.left = Math.round(x)+'px'; m.style.top = Math.round(y)+'px';
+    m.dataset.x = Math.round(x); m.dataset.y = Math.round(y);
+    positions[m.id] = {x:Math.round(x), y:Math.round(y)};
+  });
+  
+  try{ localStorage.setItem('org_positions_v1', JSON.stringify(positions)); }catch(ex){}
+  renderOrgConnectors();
+  updateMinimap();
+  toast('Radial layout applied','ok');
+}
+
+// ── ADD / EDIT / DELETE ────────────────────────────────────
+async function addOrgMember(){
+  var name=document.getElementById('orgName').value.trim();
+  var pos=document.getElementById('orgPos').value.trim();
+  var cat=document.getElementById('orgCat').value;
+  if(!name||!pos){toast('Enter name and position.','warn');return;}
+  var btn=event.target;
+  btn.disabled=true;
+  var photoUrl=null;
+  if(pendingOrgPhoto){
+    var path='org/'+Date.now()+'_'+pendingOrgPhoto.name;
+    var {error:upErr}=await db.storage.from('files').upload(path,pendingOrgPhoto);
+    if(!upErr){
+      var {data:urlData}=db.storage.from('files').getPublicUrl(path);
+      photoUrl=urlData.publicUrl;
+    }
+  }
+  var {error}=await db.from('org_chart').insert([{name,position:pos,category:cat,photo_url:photoUrl}]);
+  if(error){toast('Error: '+error.message,'bad');btn.disabled=false;return;}
+  document.getElementById('orgName').value='';
+  document.getElementById('orgPos').value='';
+  document.getElementById('orgCat').value='';
+  pendingOrgPhoto=null;
+  document.getElementById('orgPhoto').value='';
+  toast('Member added!','ok');
+  loadOrgAdmin();
+  btn.disabled=false;
+}
+
+function openOrgEditPanel(id){
+  currentEditingId = id;
+  var card = document.querySelector('.org-member-card[data-id="'+id+'"]');
+  if(!card) return;
+  
+  var name = (card.querySelector('div:nth-child(2)')||{}).textContent || '';
+  var pos = (card.querySelector('div:nth-child(3)')||{}).textContent || '';
+  var cat = card.dataset.cat;
+  var photo = card.querySelector('img');
+  
+  var editCatSel = document.getElementById('editOrgCat');
+  var mainCatSel = document.getElementById('orgCat');
+  editCatSel.innerHTML = mainCatSel.innerHTML;
+  
+  document.getElementById('editOrgId').value = id;
+  document.getElementById('editOrgName').value = name;
+  document.getElementById('editOrgPos').value = pos;
+  document.getElementById('editOrgCat').value = cat;
+  
+  var preview = document.getElementById('editOrgPreview');
+  if(photo){
+    preview.innerHTML = '<img src="'+photo.src+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
+  } else {
+    var initials = name ? name.split(' ').map(function(n){return n[0]}).join('').substring(0,2).toUpperCase() : '?';
+    preview.textContent = initials;
+    preview.style.background = 'linear-gradient(135deg,rgba(139,92,246,0.3),rgba(6,182,212,0.3))';
+  }
+  
+  document.getElementById('orgPropsPanel').style.display = 'flex';
+}
+
+function closeOrgPanel(){
+  document.getElementById('orgPropsPanel').style.display = 'none';
+  currentEditingId = null;
+}
+
+async function saveOrgEdit(){
+  var id = document.getElementById('editOrgId').value;
+  var name = document.getElementById('editOrgName').value.trim();
+  var pos = document.getElementById('editOrgPos').value.trim();
+  var cat = document.getElementById('editOrgCat').value;
+  if(!name){ toast('Name required','warn'); return; }
+  saveOrgHistory();
+  var {error} = await db.from('org_chart').update({name:name,position:pos,category:cat}).eq('id',id);
+  if(error){ toast('Error: '+error.message,'bad'); return; }
+  toast('Saved!','ok');
+  var status = document.getElementById('orgSaveStatus');
+  status.style.display = 'inline';
+  setTimeout(function(){status.style.display = 'none';},2000);
+  loadOrgAdmin();
+  closeOrgPanel();
+}
+
+async function deleteOrgFromPanel(){
+  var id = document.getElementById('editOrgId').value;
+  if(!confirm('Delete this member?')) return;
+  var {error} = await db.from('org_chart').delete().eq('id',id);
+  if(error){ toast('Error: '+error.message,'bad'); return; }
+  toast('Deleted','ok');
+  loadOrgAdmin();
+  closeOrgPanel();
+}
+
+async function handleEditOrgPhoto(inp){
+  if(!inp.files[0] || !currentEditingId) return;
+  var file = inp.files[0];
+  var path = 'org/'+Date.now()+'_'+file.name;
+  var {error:upErr} = await db.storage.from('files').upload(path, file);
+  if(upErr){ toast('Upload error: '+upErr.message,'bad'); return; }
+  var {data:urlData} = db.storage.from('files').getPublicUrl(path);
+  var {error} = await db.from('org_chart').update({photo_url:urlData.publicUrl}).eq('id',currentEditingId);
+  if(error){ toast('Error: '+error.message,'bad'); return; }
+  toast('Photo updated!','ok');
+  loadOrgAdmin();
+  openOrgEditPanel(currentEditingId);
+}
+
+// ── HISTORY ─────────────────────────────────────────────────
+function saveOrgHistory(){
+  orgHistoryIndex++;
+  if(orgHistoryIndex > 10) orgHistoryIndex = 10;
+}
+
+function undoOrgChange(){ toast('Undo: reloading previous state','warn'); loadOrgAdmin(); }
+function redoOrgChange(){ toast('Redo: reloading state','warn'); loadOrgAdmin(); }
+
+// ── LEGACY COMPAT ───────────────────────────────────────────
+var ORG_CELL_W = 150, ORG_CELL_H = 180, ORG_COLS = 40, ORG_ROWS = 40;
+function zoomOrg(delta){ orgZoomAdj(delta); }
+function initOrgFreeDrag(){ initOrgCanvasDrag(); }
+function autoArrangeFreeform(){
+  document.querySelectorAll('.org-member-card, .org-cat-card').forEach(function(c){
+    c.style.left = (parseInt(c.dataset.x)||0)+'px';
+    c.style.top = (parseInt(c.dataset.y)||0)+'px';
+  });
+  toast('Freeform mode','ok');
+}
+
+// Initialize canvas drag
+initOrgCanvasDrag();
+
+// ── KEYBOARD SHORTCUTS ─────────────────────────────────────
+document.addEventListener('keydown', function(e){
+  if(e.ctrlKey && e.key === 'z'){ e.preventDefault(); undoOrgChange(); }
+  if(e.ctrlKey && e.key === 'Z'){ e.preventDefault(); redoOrgChange(); }
+  if(e.key === 'Delete' && currentEditingId){ deleteOrgFromPanel(); }
+});
+
+// ── STATUS ───────────────────────────────────────────────────
+async function loadStatus(){
+  var [cad,ent,enc,adm,mat,rep]=await Promise.all([
+    db.from('cadets').select('*',{count:'exact',head:true}),
+    db.from('merit_entries').select('*',{count:'exact',head:true}),
+    db.from('allowed_encoders').select('*',{count:'exact',head:true}),
+    db.from('allowed_admins').select('*',{count:'exact',head:true}),
+    db.from('mat_records').select('*',{count:'exact',head:true}),
+    db.from('reports').select('*',{count:'exact',head:true})
+  ]);
+  document.getElementById('stCadets').textContent=cad.count??0;
+  document.getElementById('stEntries').textContent=ent.count??0;
+  document.getElementById('stEncoders').textContent=enc.count??0;
+  document.getElementById('stAdmins').textContent=adm.count??0;
+  document.getElementById('stMAT').textContent=mat.count??0;
+  document.getElementById('stReports').textContent=rep.count??0;
+}
+
+// ── COUNTDOWN TIMER (ED monthly reset) ───────────────────────
+function startEdCountdown(){
+  var el=document.getElementById('edCountdown');
+  if(!el)return;
+  function update(){
+    var now=new Date();
+    var next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,0,0);
+    var diff=next-now;
+    var d=Math.floor(diff/86400000);
+    var h=Math.floor((diff%86400000)/3600000);
+    var m=Math.floor((diff%3600000)/60000);
+    var s=Math.floor((diff%60000)/1000);
+    el.textContent=d+'d '+h+'h '+m+'m '+s+'s';
+  }
+  update();setInterval(update,1000);
+}
+
+boot();
+</script>
+<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('../sw.js').catch(()=>{});</script>
+</body>
+</html>

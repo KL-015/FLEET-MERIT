@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About · Fleet Merits</title>
+  <link rel="icon" type="image/png" href="../logo.png?v=2">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#5b8dee">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <style>
+    :root{--bg:#06060d;--sur:#111120;--sur2:#181828;--bor:rgba(255,255,255,0.06);--bor2:rgba(255,255,255,0.12);--acc:#5b8dee;--acc2:#7c5cfc;--tx:#eeeef5;--tx2:#9999b0;--tx3:#5a5a72;--ok:#34d399;--bad:#f87171;--pur:#8b5cf6;--teal:#22d3ee}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+    
+    /* PRELOADER */
+    #preloader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s}
+    #preloader.fade-out{opacity:0;pointer-events:none}
+    .preloader-logo-wrap{display:grid;place-items:center;width:130px;height:130px;margin:0 auto 8px}
+    .preloader-logo{grid-area:1/1;width:80px;height:80px;object-fit:contain;filter:drop-shadow(0 0 15px rgba(91,141,238,0.5));animation:logoPulse 1.5s ease-in-out infinite}
+    .preloader-ring{grid-area:1/1;width:120px;height:120px;border:2px solid rgba(91,141,238,0.2);border-radius:50%;animation:ringSpin 2s linear infinite}
+    @keyframes logoPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+    @keyframes ringSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    .preloader-text{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--tx2);margin-top:15px;letter-spacing:2px}
+    
+    /* KINETIC GRID */
+    .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(91,141,238,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(91,141,238,0.03)1px,transparent 1px);background-size:60px 60px;animation:gridMove 20s linear infinite}
+    @keyframes gridMove{0%{transform:translate(0,0)}100%{transform:translate(60px,60px)}}
+    .bg-glow{position:fixed;top:-30%;left:20%;width:80vw;height:80vw;border-radius:50%;background:radial-gradient(circle,rgba(91,141,238,0.08) 0%,transparent 60%);pointer-events:none;z-index:0;animation:glowFloat 15s ease-in-out infinite}
+    .bg-glow2{position:fixed;bottom:-20%;right:-10%;width:50vw;height:50vw;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.06) 0%,transparent 60%);pointer-events:none;z-index:0;animation:glowFloat 18s ease-in-out infinite 3s}
+    @keyframes glowFloat{0%,100%{opacity:0.5;transform:translate(0,0) scale(1)}50%{opacity:0.8;transform:translate(30px,-30px) scale(1.1)}}
+    .page{position:relative;z-index:1}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--bor);backdrop-filter:blur(20px);background:rgba(6,6,13,0.88)}
+    .nav-brand{display:flex;align-items:center;gap:10px}
+    .nav-logo-img{width:34px;height:34px;object-fit:contain}
+    .nav-name{font-family:'Syne',sans-serif;font-weight:800;font-size:16px}
+    .nav-name span{color:var(--acc)}
+    .nb{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;border:1px solid var(--bor);background:transparent;color:var(--tx2);transition:all .2s}
+    .nb:hover{border-color:var(--acc);color:var(--acc)}
+    .nb.act{background:var(--pur);color:#fff;border-color:var(--pur)}
+    .main{max-width:1100px;margin:0 auto;padding:40px 20px}
+    .tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+    .tab-btn{padding:10px 20px;border-radius:10px;border:1px solid var(--bor);background:var(--sur);color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+    .tab-btn:hover{border-color:var(--acc);color:var(--tx)}
+    .tab-btn.active{background:var(--pur);color:#fff;border-color:var(--pur)}
+    .section{display:none}
+    .section.active{display:block}
+    .section-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px}
+    .section-sub{color:var(--tx2);font-size:13px;margin-bottom:24px}
+    .memo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+    .memo-card{background:var(--sur);border:1px solid var(--bor2);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s}
+    .memo-card:hover{border-color:var(--acc);transform:translateY(-2px)}
+    .memo-preview{height:140px;background:var(--sur2);display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:12px;position:relative;overflow:hidden}
+    .memo-preview img{width:100%;height:100%;object-fit:cover}
+    .memo-preview .pdf-icon{font-size:40px;margin-bottom:8px}
+    .memo-info{padding:14px}
+    .memo-title{font-weight:600;font-size:14px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .memo-date{font-size:11px;color:var(--tx3)}
+    .memo-type{font-size:10px;padding:3px 8px;border-radius:4px;background:var(--acc);color:#fff;display:inline-block;margin-top:8px}
+    .empty{text-align:center;padding:48px;color:var(--tx3)}
+    .org-chart{background:var(--sur);border:1px solid var(--bor2);border-radius:16px;padding:24px;min-height:400px;overflow-x:auto}
+.org-card:hover{transform:translateY(-5px);box-shadow:0 8px 25px rgba(139,92,246,0.3)!important;border-color:var(--pur)!important}
+    .org-node{position:absolute;background:var(--sur2);border:2px solid var(--bor2);border-radius:12px;padding:12px;min-width:120px;text-align:center;cursor:grab;transition:all .2s}
+    .org-node:hover{border-color:var(--acc)}
+    .org-node img{width:50px;height:50px;border-radius:50%;object-fit:cover;margin-bottom:8px}
+    .org-node .name{font-weight:600;font-size:12px;margin-bottom:2px}
+    .org-node .pos{font-size:10px;color:var(--tx3)}
+    .org-line{position:absolute;background:var(--bor);width:2px}
+    .spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+    @keyframes sp{to{transform:rotate(360deg)}}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:999;display:none;align-items:center;justify-content:center;padding:20px}
+    .modal.open{display:flex}
+    .modal-content{background:var(--sur);border:1px solid var(--bor2);border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+    .modal-header{padding:16px 20px;border-bottom:1px solid var(--bor);display:flex;justify-content:space-between;align-items:center}
+    .modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px}
+    .modal-close{width:30px;height:30px;border-radius:8px;border:none;background:var(--sur2);color:var(--tx);cursor:pointer;font-size:18px}
+    .modal-body{flex:1;overflow-y:auto;padding:20px}
+    .modal-body img{max-width:100%;height:auto}
+    .modal-body embed{width:100%;height:70vh}
+  </style>
+</head>
+<body>
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="preloader-logo-wrap">
+    <div class="preloader-ring"></div>
+    <img src="../logo.png?v=2" class="preloader-logo" alt="Loading" onerror="this.style.display='none'">
+  </div>
+  <div class="preloader-text">LOADING</div>
+</div>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="bg-glow2"></div>
+<div class="page">
+<nav>
+  <div class="nav-brand">
+    <img src="../logo.png?v=2" class="nav-logo-img" onerror="this.style.display='none'" alt="HR">
+    <div class="nav-name">Fleet <span>Merits</span></div>
+  </div>
+  <div style="display:flex;gap:6px">
+    <a href="../index.html" class="nb">Lookup</a>
+    <a href="about.html" class="nb act">About</a>
+  </div>
+</nav>
+<div class="main">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('memos',this)">📜 Memos</button>
+    <button class="tab-btn" onclick="switchTab('org',this)">🏢 Org Chart</button>
+  </div>
+
+  <div id="sec-memos" class="section active">
+    <div class="section-title">HR Department Memos</div>
+    <div class="section-sub">Official memos and documents from the Human Resource Department.</div>
+    <div class="memo-grid" id="memoGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--tx3)"><span class="spin"></span> Loading…</div>
+    </div>
+  </div>
+
+  <div id="sec-org" class="section">
+    <div class="section-title">Organization Chart</div>
+    <div class="section-sub">Structure and leadership of the Human Resource Department.</div>
+    <div class="org-chart" id="orgChart">
+      <div style="text-align:center;padding:48px;color:var(--tx3)"><span class="spin"></span> Loading…</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal" id="memoModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Memo</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+var db = getDB();
+
+async function loadMemos(){
+  const grid=document.getElementById('memoGrid');
+  const {data, error}=await db.from('memos').select('*').order('created_at',{ascending:false});
+  grid.innerHTML='';
+  if(!data||!data.length){
+    grid.innerHTML='<div class="empty">📭 No memos available yet.<br><span style="font-size:12px;color:var(--tx3)">Upload in Admin panel.</span></div>';
+    return;
+  }
+  data.forEach(m=>{
+    const dt=m.created_at?new Date(m.created_at).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}):'—';
+    const card=document.createElement('div');
+    card.className='memo-card';
+    card.onclick=()=>openMemo(m);
+    const ext=m.file_url?m.file_url.split('.').pop().toLowerCase():'';
+    const isImg=['jpg','jpeg','png','gif','webp'].includes(ext);
+    card.innerHTML=`
+      <div class="memo-preview">
+        ${isImg?'<img src="'+m.file_url+'">':'<div class="pdf-icon">📄</div>'}
+      </div>
+      <div class="memo-info">
+        <div class="memo-title">${m.title||'Untitled'}</div>
+        <div class="memo-date">${dt}</div>
+        <div class="memo-type">${ext.toUpperCase()}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+async function loadOrgChart(){
+  const container=document.getElementById('orgChart');
+  const {data, error} = await db.from('org_chart').select('*').order('id',{ascending:true});
+  container.innerHTML='';
+  if(!data || data.length === 0){
+    container.innerHTML='<div class="empty" style="padding:60px">🏢 No organization chart yet.<br><span style="font-size:14px;color:var(--tx3)">Add members in Admin panel.</span></div>';
+    return;
+  }
+  
+  // Group by category
+  const groups = {};
+  data.forEach(m => {
+    let cat = (m.category || 'FUNCTIONS').toUpperCase();
+    if(!groups[cat]) groups[cat] = [];
+    groups[cat].push(m);
+  });
+  
+  // Load category order
+  var catOrder = {};
+  var defaultCatOrder = {HEAD:1,MANAGEMENT:2,'EXECUTIVE OFFICER':3,FUNCTIONS:4};
+  try{
+    var cats = await db.from('org_categories').select('id,name,order_index');
+    if(cats.data){
+      cats.data.forEach(function(c){ catOrder[c.name] = c.order_index || 99; });
+    }
+  }catch(e){}
+  var allCats = Object.keys(groups);
+  allCats.sort(function(a,b){
+    return (catOrder[a] || defaultCatOrder[a] || 99) - (catOrder[b] || defaultCatOrder[b] || 99);
+  });
+  
+  // Build category-based tree with card grid per group
+  var html = '<div style="display:flex;flex-direction:column;align-items:center;padding:20px;overflow-x:auto">';
+  allCats.forEach(function(cat, idx){
+    var members = groups[cat] || [];
+    if(members.length === 0) return;
+    
+    html += '<div style="text-align:center;margin-bottom:8px">';
+    html += '<div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--pur),var(--acc2));padding:10px 24px;border-radius:25px;box-shadow:0 4px 15px rgba(139,92,246,0.3)">'+
+      '<span style="font-family:Syne,sans-serif;font-weight:800;font-size:14px;color:#fff">'+cat+'</span></div></div>';
+    
+    html += '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin-bottom:30px;position:relative;padding-top:15px">';
+    
+    // Vertical connector from category to members
+    html += '<div style="position:absolute;top:0;left:50%;width:2px;height:15px;background:linear-gradient(to bottom,var(--pur),rgba(139,92,246,0.3))"></div>';
+    
+    members.forEach(function(m){
+      var photo = m.photo_url || '';
+      html += '<div class="org-card" style="background:var(--sur);border:2px solid var(--bor2);border-radius:16px;padding:16px;min-width:150px;text-align:center;transition:all 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.2);position:relative">'+
+        '<div style="position:absolute;top:-2px;left:-2px;right:-2px;height:4px;background:linear-gradient(90deg,var(--pur),var(--acc));border-radius:16px 16px 0 0"></div>'+
+        (photo?'<img src="'+photo+'" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:10px;border:3px solid var(--sur2)">':'<div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--pur),var(--acc));margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:700;border:3px solid var(--sur2)">'+(m.name?m.name[0]:'?')+'</div>')+
+        '<div style="font-weight:700;font-size:14px;color:var(--tx)">'+(m.name||'Name')+'</div>'+
+        '<div style="font-size:12px;color:var(--acc);margin-top:4px">'+(m.position||'Position')+'</div>'+
+        '<div style="font-size:10px;color:var(--tx3);margin-top:8px;padding:4px 8px;background:var(--sur2);border-radius:10px;display:inline-block">'+(m.category ? (m.category.indexOf(' > ')>0 ? m.category.split(' > ')[1] : m.category) : 'Staff')+'</div></div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+function createOrgNode(m){
+  const node=document.createElement('div');
+  node.style.cssText='display:inline-block;vertical-align:top;text-align:center';
+  node.innerHTML=`
+    <div style="background:var(--sur2);border:2px solid var(--bor2);border-radius:12px;padding:16px;min-width:120px">
+      ${m.photo_url?'<img src="'+m.photo_url+'" style="width:50px;height:50px;border-radius:50%;object-fit:cover;margin-bottom:8px">':'<div style="width:50px;height:50px;border-radius:50%;background:var(--pur);margin:0 auto 8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700">'+(m.name?m.name[0]:'?')+'</div>'}
+      <div style="font-weight:600;font-size:13px">${m.name||'Name'}</div>
+      <div style="font-size:11px;color:var(--tx3)">${m.position||'Position'}</div>
+    </div>`;
+  return node;
+}
+
+function switchTab(tab, el){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  (el||event.target).classList.add('active');
+  document.getElementById('sec-'+tab).classList.add('active');
+  if(tab==='memos')loadMemos();
+  if(tab==='org')loadOrgChart();
+}
+
+function openMemo(m){
+  document.getElementById('modalTitle').textContent=m.title||'Memo';
+  const body=document.getElementById('modalBody');
+  const ext=m.file_url?m.file_url.split('.').pop().toLowerCase():'';
+  if(['jpg','jpeg','png','gif','webp'].includes(ext)){
+    body.innerHTML='<img src="'+m.file_url+'">';
+  } else if(ext==='pdf'){
+    body.innerHTML='<embed src="'+m.file_url+'">';
+  } else if(['doc','docx'].includes(ext)){
+    body.innerHTML='<div style="text-align:center;padding:40px;color:var(--tx3)">📄 <a href="'+m.file_url+'" target="_blank" style="color:var(--acc)">Click to view document</a></div>';
+  } else {
+    body.innerHTML='<div style="text-align:center;padding:40px;color:var(--tx3)">📄 <a href="'+m.file_url+'" target="_blank" style="color:var(--acc)">Click to download</a></div>';
+  }
+  document.getElementById('memoModal').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('memoModal').classList.remove('open');
+}
+
+document.getElementById('memoModal').addEventListener('click',e=>{if(e.target.id==='memoModal')closeModal();});
+
+// Show loading immediately
+document.getElementById('memoGrid').innerHTML = '<div class="empty">Loading...</div>';
+document.getElementById('orgChart').innerHTML = '<div class="empty">Loading...</div>';
+
+loadMemos().catch(e => {
+  document.getElementById('memoGrid').innerHTML = '<div class="empty">Error loading memos.<br>'+e.message+'</div>';
+});
+loadOrgChart().catch(e => {
+  document.getElementById('orgChart').innerHTML = '<div class="empty">Error loading org chart.<br>'+e.message+'</div>';
+});
+// Hide preloader
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    var preloader = document.getElementById('preloader');
+    if(preloader){preloader.classList.add('fade-out');setTimeout(function(){preloader.style.display='none';},500);}
+  }, 600);
+});
+</script>
+<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('../sw.js').catch(()=>{});</script>
+</body>
+</html>
