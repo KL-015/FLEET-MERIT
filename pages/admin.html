@@ -1642,41 +1642,286 @@ function downloadSampleTemplate(){
 }
 
 function handleX(inp){
-  const file=inp.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const wb=XLSX.read(e.target.result,{type:'array'});
-    const ws=wb.Sheets[wb.SheetNames[0]];
-    const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-    impD=[];
-    rows.forEach(row=>{
-      const team=row['Team']||row['team']||row['TEAM']||'';
-      const name=(row['Name']||row['name']||row['NAME']||'').toString().trim().toUpperCase();
-      const batchRaw=row['Batch']||row['batch']||row['BATCH']||'';
-      const batch=parseInt(batchRaw)||null;
-      if(name)impD.push({name,team:parseInt(team)||null,batch});
-    });
-    document.getElementById('ipt').textContent=`${impD.length} cadets found`;
-    document.getElementById('ipr').innerHTML=impD.slice(0,8).map(r=>`<div>${r.name} — Team ${r.team||'?'} — Batch ${r.batch||'?'}</div>`).join('')+(impD.length>8?`<div>…and ${impD.length-8} more</div>`:'');
-    document.getElementById('iprev').style.display='block';document.getElementById('ib').style.display='block';
-  };reader.readAsArrayBuffer(file);
+  const file = inp.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      impD = [];
+      let totalSheetsFound = wb.SheetNames.length;
+
+      // Find best sheet or scan all sheets if sheet 1 is empty
+      for(let sIdx = 0; sIdx < totalSheetsFound; sIdx++){
+        const sName = wb.SheetNames[sIdx];
+        const ws = wb.Sheets[sName];
+        if(!ws) continue;
+
+        // Try extracting sheet-level batch year from sheet name (e.g. "Batch 2024", "2025", "Class 2026")
+        let sheetBatch = null;
+        const sMatch = sName.match(/\b(20\d{2})\b/);
+        if(sMatch) sheetBatch = parseInt(sMatch[1]);
+
+        // Convert sheet to 2D array of rows
+        const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        if(!matrix || !matrix.length) continue;
+
+        // Detect header row (scan rows 0 to 10)
+        let headerRowIdx = -1;
+        let colMap = { name: -1, team: -1, batch: -1 };
+
+        for(let r = 0; r < Math.min(12, matrix.length); r++){
+          const row = matrix[r];
+          if(!Array.isArray(row)) continue;
+          
+          let foundName = -1, foundTeam = -1, foundBatch = -1;
+          for(let c = 0; c < row.length; c++){
+            const cellVal = String(row[c] || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+            if(foundName === -1 && (cellVal.includes('name') || cellVal.includes('cadet') || cellVal.includes('student') || cellVal.includes('person') || cellVal === 'full' || cellVal === 'names')){
+              foundName = c;
+            }
+            if(foundTeam === -1 && (cellVal.includes('team') || cellVal.includes('squad') || cellVal.includes('group') || cellVal.includes('section') || cellVal.includes('division') || cellVal === 't')){
+              foundTeam = c;
+            }
+            if(foundBatch === -1 && (cellVal.includes('batch') || cellVal.includes('year') || cellVal.includes('class') || cellVal.includes('grad') || cellVal === 'yr')){
+              foundBatch = c;
+            }
+          }
+          if(foundName !== -1){
+            headerRowIdx = r;
+            colMap = { name: foundName, team: foundTeam, batch: foundBatch };
+            break;
+          }
+        }
+
+        // If no named header row found, guess by column layout (Col 0/1: Name, Col 0/1: Team, Col 2: Batch)
+        const startRow = headerRowIdx !== -1 ? headerRowIdx + 1 : 0;
+
+        for(let r = startRow; r < matrix.length; r++){
+          const row = matrix[r];
+          if(!Array.isArray(row) || !row.length) continue;
+
+          let rawName = '';
+          let rawTeam = '';
+          let rawBatch = '';
+
+          if(headerRowIdx !== -1){
+            rawName = colMap.name !== -1 ? row[colMap.name] : '';
+            rawTeam = colMap.team !== -1 ? row[colMap.team] : '';
+            rawBatch = colMap.batch !== -1 ? row[colMap.batch] : '';
+          } else {
+            // Heuristic detection based on cell values
+            for(let c = 0; c < row.length; c++){
+              const val = String(row[c] || '').trim();
+              if(!val) continue;
+              if(!rawBatch && val.match(/\b(20\d{2})\b/)){
+                rawBatch = val;
+              } else if(!rawTeam && val.match(/^(team\s*)?\d{1,2}$/i)){
+                rawTeam = val;
+              } else if(!rawName && val.length >= 3 && /[a-zA-Z]/.test(val)){
+                rawName = val;
+              }
+            }
+          }
+
+          // Format name
+          let name = String(rawName || '').trim().replace(/\s+/g, ' ').toUpperCase();
+          // Remove numbering prefixes like "1. ", "01. ", "1) "
+          name = name.replace(/^(\d+[\.\)\-–]\s*)/, '').trim();
+          // Ignore invalid header-like or summary names
+          if(!name || name.length < 2 || /^(NAME|CADET NAME|FULL NAME|STUDENT NAME|TOTAL|SUBTOTAL|PAGE|SIGNATURE)$/i.test(name) || !/[A-Z]/.test(name)){
+            continue;
+          }
+
+          // Format team
+          let team = 1;
+          if(rawTeam !== undefined && rawTeam !== null && String(rawTeam).trim() !== ''){
+            const numMatch = String(rawTeam).match(/\d+/);
+            if(numMatch) team = parseInt(numMatch[0]) || 1;
+          }
+
+          // Format batch
+          let batch = sheetBatch;
+          if(rawBatch !== undefined && rawBatch !== null && String(rawBatch).trim() !== ''){
+            const bMatch = String(rawBatch).match(/\b(20\d{2})\b/);
+            if(bMatch){
+              batch = parseInt(bMatch[1]);
+            } else {
+              const twoDig = String(rawBatch).match(/\b(\d{2})\b/);
+              if(twoDig){
+                const yr = parseInt(twoDig[1]);
+                batch = yr < 50 ? 2000 + yr : 1900 + yr;
+              }
+            }
+          }
+          if(!batch){
+            // Default to current year or 2025 if cannot be determined
+            batch = 2025;
+          }
+
+          // Prevent duplicate rows within the uploaded file itself
+          if(!impD.some(item => item.name === name)){
+            impD.push({ name, team, batch });
+          }
+        }
+
+        if(impD.length > 0) break; // Found valid data in this sheet
+      }
+
+      if(!impD.length){
+        toast('No cadet rows found. Please check Excel format.', 'warn');
+        document.getElementById('ipt').textContent = '0 cadets detected';
+        document.getElementById('ipr').innerHTML = '<div style="color:var(--bad)">No valid cadet names detected in this spreadsheet. Please ensure columns include Cadet Name, Team, and Batch.</div>';
+        document.getElementById('iprev').style.display = 'block';
+        document.getElementById('ib').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('ipt').textContent = `${impD.length} cadet(s) ready to import`;
+      document.getElementById('ipr').innerHTML = impD.slice(0, 8).map(r => `<div><strong>${r.name}</strong> — Team ${r.team} — Batch ${r.batch}</div>`).join('') + (impD.length > 8 ? `<div style="margin-top:4px;color:var(--tx3)">…and ${impD.length - 8} more</div>` : '');
+      document.getElementById('iprev').style.display = 'block';
+      document.getElementById('ib').style.display = 'block';
+      toast(`${impD.length} cadets detected from Excel file.`, 'ok');
+    } catch(err){
+      console.error('Excel parse error:', err);
+      toast('Failed to read Excel file: ' + err.message, 'bad');
+    }
+  };
+  reader.readAsArrayBuffer(file);
 }
+
 async function execI(){
-  if(!impD.length){toast('No data.','warn');return;}
-  const btn=document.getElementById('ib');btn.innerHTML='<span class="spin"></span> Importing…';btn.disabled=true;
-  let add=0,sk=0,err_other=0;
-  for(const c of impD){
-    const {error}=await db.from('cadets').insert([{name:c.name,team:c.team,batch:c.batch,quota_dr:0,quota_ed:0}]);
-    if(error&&error.code==='23505')sk++;
-    else if(!error)add++;
-    else err_other++;
+  if(!impD || !impD.length){
+    toast('No cadet data to import.', 'warn');
+    return;
   }
-  btn.textContent='Import Cadets';btn.disabled=false;
-  toast(`Imported ${add}. Skipped ${sk} existing.${err_other?' Errors: '+err_other:''}`,'ok');
-  impD=[];document.getElementById('iprev').style.display='none';btn.style.display='none';document.getElementById('xi').value='';
-  if(typeof loadMasterList==='function') await loadMasterList();
-  if(typeof loadSummary==='function') await loadSummary();
-  if(typeof loadStatus==='function') await loadStatus();
+  const btn = document.getElementById('ib');
+  btn.innerHTML = '<span class="spin"></span> Importing…';
+  btn.disabled = true;
+
+  showProgressPopup({
+    title: 'Importing Cadets from Excel',
+    status: 'Step 1/3: Checking existing cadet database records…',
+    percent: 20
+  });
+
+  try {
+    // 1. Fetch all existing active cadets from Supabase to prevent duplicate key errors
+    const { data: existingCadets, error: fetchErr } = await db.from('cadets')
+      .select('id, name, batch, team')
+      .not('name', 'ilike', '[DELETED%');
+
+    if(fetchErr){
+      console.warn('Could not pre-fetch existing cadets:', fetchErr);
+    }
+
+    const existingMap = new Map();
+    (existingCadets || []).forEach(c => {
+      if(c && c.name) existingMap.set(c.name.trim().toUpperCase(), c);
+    });
+
+    let add = 0, sk = 0, err_other = 0;
+    const toInsert = [];
+    const errorDetails = [];
+
+    // 2. Separate new vs existing cadets
+    for(const c of impD){
+      if(existingMap.has(c.name)){
+        sk++;
+      } else {
+        toInsert.push(c);
+      }
+    }
+
+    updateProgressPopup({
+      status: `Step 2/3: Inserting ${toInsert.length} new cadets (${sk} existing skipped)…`,
+      percent: 50
+    });
+
+    // 3. Batch insert new cadets in chunks of 20 with individual fallback
+    if(toInsert.length > 0){
+      const chunkSize = 20;
+      for(let i = 0; i < toInsert.length; i += chunkSize){
+        const chunk = toInsert.slice(i, i + chunkSize);
+        const payload = chunk.map(c => ({
+          name: c.name,
+          team: parseInt(c.team) || 1,
+          batch: parseInt(c.batch) || 2025,
+          quota_dr: 0,
+          quota_ed: 0
+        }));
+
+        const { data: insertedData, error: chunkErr } = await db.from('cadets').insert(payload).select();
+
+        if(!chunkErr){
+          add += payload.length;
+        } else {
+          console.warn('Chunk insert failed, falling back to individual inserts:', chunkErr);
+          // Individual fallback
+          for(const item of payload){
+            const { error: singleErr } = await db.from('cadets').insert([item]).select();
+            if(!singleErr){
+              add++;
+            } else {
+              const errMsg = (singleErr.message || '').toLowerCase();
+              if(singleErr.code === '23505' || errMsg.includes('duplicate') || errMsg.includes('unique')){
+                sk++;
+              } else {
+                err_other++;
+                errorDetails.push(`${item.name}: ${singleErr.message || 'Insert error'}`);
+                console.error('Cadet insert error for', item.name, singleErr);
+              }
+            }
+          }
+        }
+
+        const pct = Math.min(90, Math.round(50 + ((i + chunk.length) / toInsert.length) * 40));
+        updateProgressPopup({
+          status: `Importing cadets: ${add} added…`,
+          percent: pct
+        });
+      }
+    }
+
+    updateProgressPopup({
+      status: 'Step 3/3: Synchronizing Master List and Summary…',
+      percent: 95
+    });
+
+    // 4. Refresh UI
+    if(typeof loadMasterList === 'function') await loadMasterList();
+    if(typeof loadSummary === 'function') await loadSummary();
+    if(typeof loadStatus === 'function') await loadStatus();
+
+    hideProgressPopup();
+
+    btn.textContent = 'Import Cadets';
+    btn.disabled = false;
+    impD = [];
+    document.getElementById('iprev').style.display = 'none';
+    btn.style.display = 'none';
+    document.getElementById('xi').value = '';
+
+    if(err_other > 0){
+      showSuccessPopup({
+        title: 'Import Completed with Notice',
+        message: `Imported ${add} new cadets. Skipped ${sk} existing.`,
+        details: `${err_other} cadet(s) could not be inserted:\n` + errorDetails.slice(0, 5).join('\n')
+      });
+    } else {
+      showSuccessPopup({
+        title: 'Cadets Imported Successfully',
+        message: `Successfully imported ${add} new cadet(s) into database.`,
+        details: `${sk} existing cadet(s) were safely skipped without duplicates.`
+      });
+    }
+  } catch(ex){
+    hideProgressPopup();
+    btn.textContent = 'Import Cadets';
+    btn.disabled = false;
+    console.error('Import execution error:', ex);
+    toast('Import error: ' + ex.message, 'bad');
+  }
 }
 const fd2=document.getElementById('fd');
 if(fd2){
