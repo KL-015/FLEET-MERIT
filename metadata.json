@@ -1,0 +1,8 @@
+{
+  "name": "Fleet Merit System",
+  "description": "Fleet Merit System for HR Department - lookup merit records, view memos, organization chart, and manage records.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

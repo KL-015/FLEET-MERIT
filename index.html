@@ -240,8 +240,41 @@ footer a:hover{text-decoration:underline}
     <a href="pages/encode.html" class="mi menu-encode">✏️ Encode</a>
     <a href="pages/admin.html" class="mi menu-admin">⚙️ Admin</a>
     <a href="pages/feedback.html" class="mi menu-feedback">💬 Feedback</a>
-    <a href="#" class="mi menu-login" id="menuLoginBtn" onclick="signInWithGoogle()">Sign In</a>
+    <a href="#" class="mi menu-login" id="menuLoginBtn" onclick="openLoginModal()">Sign In</a>
     <a href="#" class="mi menu-logout" id="menuLogoutBtn" onclick="signOut()" style="display:none">Logout</a>
+  </div>
+</div>
+
+<!-- SIGN IN MODAL -->
+<div id="loginModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:300;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--sur);border:1px solid var(--bor2);border-radius:18px;width:100%;max-width:380px;padding:28px;text-align:center;position:relative;box-shadow:0 20px 50px rgba(0,0,0,0.6)">
+    <button onclick="closeLoginModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--tx3);cursor:pointer;font-size:20px">✕</button>
+    <h3 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px">Sign In</h3>
+    <p style="color:var(--tx2);font-size:13px;margin-bottom:20px">Access Encoder &amp; Admin capabilities</p>
+    
+    <button class="sbtn" onclick="signInWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;margin-bottom:14px;background:var(--sur2);border:1px solid var(--bor2);color:var(--tx)">
+      <svg style="width:18px;height:18px;flex-shrink:0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Sign in with Google
+    </button>
+
+    <div style="display:flex;align-items:center;margin:14px 0;color:var(--tx3);font-size:12px">
+      <div style="flex:1;height:1px;background:var(--bor)"></div>
+      <span style="padding:0 8px">OR</span>
+      <div style="flex:1;height:1px;background:var(--bor)"></div>
+    </div>
+
+    <form onsubmit="handleIndexEmailAuth(event)" style="display:flex;flex-direction:column;gap:8px">
+      <input type="email" id="modalEmailInp" placeholder="authorized@gmail.com" required
+        style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--bor2);background:var(--sur2);color:var(--tx);font-size:13px;outline:none">
+      <button type="submit" id="modalEmailBtn" class="sbtn" style="width:100%;padding:11px;justify-content:center">
+        Sign In with Email
+      </button>
+    </form>
+    <div id="modalAuthMsg" style="color:var(--bad);font-size:12px;margin-top:10px;display:none"></div>
+    <div style="font-size:11px;color:var(--tx3);margin-top:14px;line-height:1.4">
+      Desktop / Preview mode: 
+      <a href="javascript:void(0)" onclick="openInDesktopTab()" style="color:var(--acc);text-decoration:underline">Open in Standalone Tab</a>
+    </div>
   </div>
 </div>
 
@@ -426,10 +459,10 @@ async function init() {
       document.querySelectorAll('.menu-feedback').forEach(el=>el.style.display='flex');
       document.querySelectorAll('.menu-lookup')[0]?.classList.remove('act');
     }
-    const { data: names } = await db.from('cadets').select('name').order('name');
+    const { data: names } = await db.from('cadets').select('name').not('batch','is',null).not('name','ilike','[DELETED%').order('name');
     if (names) allNames = names.map(r => r.name);
     const [{ count: cc },{ count: ec },{ data: ops }] = await Promise.all([
-      db.from('cadets').select('*',{count:'exact',head:true}),
+      db.from('cadets').select('*',{count:'exact',head:true}).not('batch','is',null).not('name','ilike','[DELETED%'),
       db.from('merit_entries').select('*',{count:'exact',head:true}),
       db.from('merit_entries').select('operator')
     ]);
@@ -474,6 +507,46 @@ async function switchTab(tab){
     list.appendChild(d);
   });
   if(!list.children.length)list.innerHTML='<div class="es">No records.</div>';
+}
+
+function openLoginModal() {
+  var m = document.getElementById('loginModal');
+  if (m) m.style.display = 'flex';
+  var d = document.getElementById('mdrawer');
+  var o = document.getElementById('moverlay');
+  if (d) d.classList.remove('on');
+  if (o) o.style.display = 'none';
+}
+
+function closeLoginModal() {
+  var m = document.getElementById('loginModal');
+  if (m) m.style.display = 'none';
+  var msg = document.getElementById('modalAuthMsg');
+  if (msg) msg.style.display = 'none';
+}
+
+async function handleIndexEmailAuth(e) {
+  if (e) e.preventDefault();
+  const inp = document.getElementById('modalEmailInp');
+  const btn = document.getElementById('modalEmailBtn');
+  const msg = document.getElementById('modalAuthMsg');
+  const email = inp ? inp.value.trim() : '';
+  if (!email) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Verifying…'; }
+  if (msg) msg.style.display = 'none';
+
+  const res = await signInWithAuthorizedEmail(email);
+  if (btn) { btn.disabled = false; btn.textContent = 'Sign In with Email'; }
+
+  if (res.success) {
+    closeLoginModal();
+    await init();
+  } else {
+    if (msg) {
+      msg.textContent = res.error || 'Sign in failed.';
+      msg.style.display = 'block';
+    }
+  }
 }
 
 // Setup overlay click to close

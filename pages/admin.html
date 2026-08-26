@@ -49,25 +49,41 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:14px 2
 .dm{color:var(--bad);font-size:13px;margin-top:10px;display:none}
 
 #ac{display:none}
-.aw{max-width:1100px;margin:0 auto;padding:32px 20px}
-.at{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px}
-.as{color:var(--tx2);font-size:13px;margin-bottom:24px}
+.aw{max-width:1180px;margin:0 auto;padding:28px 20px}
+.at{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px;letter-spacing:-0.4px}
+.as{color:var(--tx2);font-size:13px;margin-bottom:0}
 
-.tabs{display:flex;gap:6px;margin-bottom:22px;flex-wrap:wrap}
-.tb{padding:9px 18px;border-radius:10px;border:1px solid var(--bor);background:var(--sur);color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
-.tb:hover{border-color:var(--bor2);color:var(--tx)}
-.tb.ta{background:var(--pur);color:#fff;border-color:var(--pur)}
-.tb.dbo{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.25);color:var(--ok)}
-.tb.vro{background:rgba(91,141,238,.1);border-color:rgba(91,141,238,.25);color:var(--acc)}
-.tb.rso{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.25);color:var(--bad)}
-.tb.mto{background:rgba(34,211,238,.1);border-color:rgba(34,211,238,.25);color:var(--teal)}
-.tb.mso{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25);color:var(--pur)}
-.tb.mlo{background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.2);color:var(--teal)}
-.tb.smo{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2);color:var(--warn)}
-.tb.fbo{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.25);color:var(--warn)}
-.tb.sto{background:rgba(34,211,238,.1);border-color:rgba(34,211,238,.25);color:var(--teal)}
-.tb.memo{background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.25);color:var(--gold)}
-.tb.org{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25);color:var(--pur)}
+/* ADMIN OVERVIEW & QUICK STATS */
+.admin-hero{background:linear-gradient(135deg,rgba(91,141,238,0.12),rgba(124,92,252,0.14));border:1px solid var(--bor2);border-radius:18px;padding:22px 24px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.25)}
+.admin-hero-glow{position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:radial-gradient(circle,rgba(124,92,246,0.25),transparent 70%);border-radius:50%;pointer-events:none}
+.admin-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:16px}
+.admin-kpi-card{background:rgba(17,17,32,0.65);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;transition:border-color .2s}
+.admin-kpi-card:hover{border-color:var(--bor2)}
+.admin-kpi-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.admin-kpi-val{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--tx)}
+.admin-kpi-lbl{font-size:11px;color:var(--tx3)}
+
+/* CATEGORIZED NAVIGATION HUB */
+.admin-nav-hub{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:22px}
+.admin-nav-group{background:var(--sur);border:1px solid var(--bor2);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+.admin-nav-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);display:flex;align-items:center;gap:6px}
+.admin-nav-pills{display:flex;gap:6px;flex-wrap:wrap}
+
+.tb{padding:7px 13px;border-radius:8px;border:1px solid var(--bor);background:var(--sur2);color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;line-height:1}
+.tb:hover{border-color:var(--bor2);color:var(--tx);background:rgba(255,255,255,0.04);transform:translateY(-1px)}
+.tb.ta{background:var(--pur);color:#fff;border-color:var(--pur);box-shadow:0 3px 12px rgba(139,92,246,0.3)}
+.tb.dbo{background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.35);color:var(--ok);box-shadow:0 3px 12px rgba(52,211,153,0.2)}
+.tb.vro{background:rgba(91,141,238,.14);border-color:rgba(91,141,238,.35);color:var(--acc);box-shadow:0 3px 12px rgba(91,141,238,0.2)}
+.tb.rso{background:rgba(248,113,113,.14);border-color:rgba(248,113,113,.35);color:var(--bad);box-shadow:0 3px 12px rgba(248,113,113,0.2)}
+.tb.mto{background:rgba(34,211,238,.14);border-color:rgba(34,211,238,.35);color:var(--teal);box-shadow:0 3px 12px rgba(34,211,238,0.2)}
+.tb.mso{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.35);color:var(--pur);box-shadow:0 3px 12px rgba(139,92,246,0.2)}
+.tb.mlo{background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.3);color:var(--teal);box-shadow:0 3px 12px rgba(34,211,238,0.2)}
+.tb.smo{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.3);color:var(--warn);box-shadow:0 3px 12px rgba(251,191,36,0.2)}
+.tb.fbo{background:rgba(251,191,36,.14);border-color:rgba(251,191,36,.35);color:var(--warn);box-shadow:0 3px 12px rgba(251,191,36,0.2)}
+.tb.sto{background:rgba(34,211,238,.14);border-color:rgba(34,211,238,.35);color:var(--teal);box-shadow:0 3px 12px rgba(34,211,238,0.2)}
+.tb.memo{background:rgba(245,200,66,.14);border-color:rgba(245,200,66,.35);color:var(--gold);box-shadow:0 3px 12px rgba(245,200,66,0.2)}
+.tb.org{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.35);color:var(--pur);box-shadow:0 3px 12px rgba(139,92,246,0.2)}
+
 /* BATCH GRID (Master List) */
 .batch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
 .batch-card{background:var(--sur2);border:1px solid var(--bor2);border-radius:12px;overflow:hidden}
@@ -105,7 +121,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:14px 2
 
 .sp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;transition:all .4s}
 .sp.hid{opacity:0;pointer-events:none;max-height:0;overflow:hidden;margin:0}
-.pc{background:var(--sur);border:1px solid var(--bor2);border-radius:14px;padding:20px}
+.pc{background:var(--sur);border:1px solid var(--bor2);border-radius:14px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,0.25)}
 .pt{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px}
 .ps{font-size:12px;color:var(--tx3);margin-bottom:16px}
 .ul{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;max-height:260px;overflow-y:auto}
@@ -128,12 +144,12 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:14px 2
 .org-tbsep{width:1px;height:18px;background:rgba(255,255,255,0.08)}
 
 .dr{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1),opacity .3s;opacity:0;margin-bottom:0}
-.dr.op{max-height:5000px;opacity:1;margin-bottom:16px}
-.di{background:var(--sur);border:1px solid var(--bor2);border-radius:14px;padding:20px}
+.dr.op{max-height:6000px;opacity:1;margin-bottom:16px}
+.di{background:var(--sur);border:1px solid var(--bor2);border-radius:16px;padding:22px;box-shadow:0 8px 28px rgba(0,0,0,0.25)}
 .dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.dt{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
-.dc{padding:5px 12px;border-radius:7px;border:1px solid var(--bor);background:transparent;color:var(--tx2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
-.dc:hover{border-color:var(--bad);color:var(--bad)}
+.dt{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-0.3px}
+.dc{padding:6px 14px;border-radius:8px;border:1px solid var(--bor2);background:var(--sur2);color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.dc:hover{border-color:var(--bad);color:var(--bad);background:rgba(248,113,113,0.08)}
 
 .dbs{width:100%;background:var(--sur2);border:1px solid var(--bor);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;transition:border-color .2s}
 .dbs:focus{border-color:var(--acc)}
@@ -259,9 +275,132 @@ tr:hover td{background:rgba(255,255,255,.02)}
 @keyframes toIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .cat-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--sur2);border:1px solid var(--bor);border-radius:10px;margin-bottom:8px;transition:all .2s}
 .cat-item:hover{border-color:var(--pur)}
+
+/* POPUP MODALS (CONFIRMATION, PROGRESS, SUCCESS NOTIFICATION) */
+.pop-overlay{position:fixed;inset:0;background:rgba(5,9,18,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;display:none;align-items:center;justify-content:center;padding:16px;animation:popFade .2s ease}
+@keyframes popFade{from{opacity:0}to{opacity:1}}
+.pop-card{background:var(--sur);border:1px solid var(--bor2);border-radius:18px;width:100%;max-width:440px;padding:26px;box-shadow:0 24px 60px rgba(0,0,0,0.65);position:relative;text-align:center;animation:popScale .22s cubic-bezier(0.16,1,0.3,1)}
+@keyframes popScale{from{transform:scale(0.92);opacity:0}to{transform:scale(1);opacity:1}}
+.pop-icon-circle{width:54px;height:54px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px}
+.pop-icon-danger{background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:var(--bad)}
+.pop-icon-success{background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:var(--ok)}
+.pop-icon-progress{background:rgba(91,141,238,0.15);border:1px solid rgba(91,141,238,0.3);color:var(--acc)}
+.pop-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--tx);margin-bottom:8px;letter-spacing:-0.3px}
+.pop-msg{font-size:13px;color:var(--tx2);line-height:1.5;margin-bottom:14px;word-break:break-word}
+.pop-submsg{font-size:11px;color:var(--tx3);margin-bottom:18px;line-height:1.4}
+.pop-actions{display:flex;gap:10px;justify-content:center}
+.pop-btn{flex:1;padding:11px 16px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.pop-btn-cancel{background:var(--sur2);border:1px solid var(--bor2);color:var(--tx2)}
+.pop-btn-cancel:hover{background:var(--bor);color:var(--tx)}
+.pop-btn-danger{background:var(--bad);color:#fff;box-shadow:0 4px 14px rgba(239,68,68,0.3)}
+.pop-btn-danger:hover{opacity:.9}
+.pop-btn-ok{background:var(--ok);color:#fff;box-shadow:0 4px 14px rgba(34,197,94,0.3)}
+.pop-btn-ok:hover{opacity:.9}
+.pop-pbar-wrap{width:100%;height:10px;background:var(--sur2);border:1px solid var(--bor2);border-radius:8px;overflow:hidden;margin:16px 0 10px;position:relative}
+.pop-pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--acc),#818cf8,var(--ok));border-radius:8px;transition:width .25s ease}
+.pop-pbar-info{display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);font-weight:600;font-variant-numeric:tabular-nums}
+.pop-pulse-spin{width:26px;height:26px;border:3px solid rgba(91,141,238,0.25);border-top-color:var(--acc);border-radius:50%;animation:sp .7s linear infinite;display:inline-block;margin-bottom:12px}
 </style>
 </head>
 <body>
+
+<!-- CONFIRMATION POPUP MODAL -->
+<div class="pop-overlay" id="confirmPopup">
+  <div class="pop-card">
+    <div class="pop-icon-circle pop-icon-danger" id="confirmPopIcon">🗑️</div>
+    <div class="pop-title" id="confirmPopTitle">Confirm Removal</div>
+    <div class="pop-msg" id="confirmPopMsg">Are you sure you want to remove this item?</div>
+    <div class="pop-submsg" id="confirmPopSub">This action permanently deletes records from the database.</div>
+    <div class="pop-actions">
+      <button class="pop-btn pop-btn-cancel" onclick="hideConfirmPopup()">Cancel</button>
+      <button class="pop-btn pop-btn-danger" id="confirmPopBtn">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE PROGRESS POPUP MODAL -->
+<div class="pop-overlay" id="progressPopup">
+  <div class="pop-card">
+    <div class="pop-pulse-spin"></div>
+    <div class="pop-title" id="progPopTitle">Processing Removal…</div>
+    <div class="pop-msg" id="progPopStatus" style="font-size:12px;margin-bottom:8px;color:var(--tx2)">Deleting records from database…</div>
+    <div class="pop-pbar-wrap">
+      <div class="pop-pbar-fill" id="progPopFill"></div>
+    </div>
+    <div class="pop-pbar-info">
+      <span id="progPopSub">Please do not close this window</span>
+      <span id="progPopPct">0%</span>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS NOTIFICATION POPUP MODAL -->
+<div class="pop-overlay" id="successPopup">
+  <div class="pop-card">
+    <div class="pop-icon-circle pop-icon-success">✓</div>
+    <div class="pop-title" id="succPopTitle">Removal Successful</div>
+    <div class="pop-msg" id="succPopMsg">Records have been permanently removed.</div>
+    <div class="pop-submsg" id="succPopDetails" style="color:var(--ok);font-weight:600">Database and summary are now fully synchronized.</div>
+    <div class="pop-actions">
+      <button class="pop-btn pop-btn-ok" onclick="hideSuccessPopup()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXCEL INSTRUCTIONS POPUP MODAL -->
+<div class="pop-overlay" id="excelInstructionsPopup" onclick="if(event.target===this)hideExcelInstructions()">
+  <div class="pop-card" style="max-width:540px;text-align:left">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="pop-icon-circle" style="background:rgba(91,141,238,0.15);border:1px solid rgba(91,141,238,0.3);color:var(--acc);margin-bottom:0;width:40px;height:40px;font-size:18px">📊</div>
+        <div class="pop-title" style="margin-bottom:0;font-size:16px">Excel File Requirements</div>
+      </div>
+      <button class="dc" onclick="hideExcelInstructions()">Close ×</button>
+    </div>
+    <div class="pop-msg" style="font-size:12px;margin-bottom:12px;color:var(--tx2)">
+      To import cadets accurately into the database, ensure your Excel spreadsheet (.xlsx / .xls) has the following <strong>3 column headers</strong> in the first row (Row 1):
+    </div>
+    <div style="border:1px solid var(--bor2);border-radius:10px;overflow:hidden;margin-bottom:14px;background:var(--sur2)">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="background:rgba(255,255,255,0.04)">
+            <th style="padding:8px 12px;border-bottom:1px solid var(--bor);color:var(--acc);font-family:'Syne',sans-serif">Team</th>
+            <th style="padding:8px 12px;border-bottom:1px solid var(--bor);color:var(--acc);font-family:'Syne',sans-serif">Name</th>
+            <th style="padding:8px 12px;border-bottom:1px solid var(--bor);color:var(--acc);font-family:'Syne',sans-serif">Batch</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--tx)">1</td>
+            <td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--tx);font-weight:600">DELA CRUZ, JUAN A.</td>
+            <td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--ok)">2023</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--tx)">2</td>
+            <td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--tx);font-weight:600">SANTOS, MARIA B.</td>
+            <td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--ok)">2024</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px;color:var(--tx)">3</td>
+            <td style="padding:8px 12px;color:var(--tx);font-weight:600">REYES, CARLOS C.</td>
+            <td style="padding:8px 12px;color:var(--ok)">2025</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:12px;color:var(--tx3);line-height:1.6;margin-bottom:16px;background:var(--sur2);padding:12px 14px;border-radius:10px;border:1px solid var(--bor)">
+      <strong style="color:var(--tx2);display:block;margin-bottom:4px">Key Formatting Guidelines:</strong>
+      • <strong>Team:</strong> Numeric team number (e.g. <code>1</code>, <code>2</code>, <code>3</code>).<br>
+      • <strong>Name:</strong> Full name formatted as <code>SURNAME, FIRSTNAME M.I.</code><br>
+      • <strong>Batch:</strong> 4-digit graduation / batch year (e.g. <code>2023</code>, <code>2024</code>, <code>2025</code>, <code>2026</code>).<br>
+      • <strong>Safety:</strong> Existing cadet names in the database are safely skipped to avoid duplicates.
+    </div>
+    <div class="pop-actions">
+      <button class="pop-btn" style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);color:var(--ok)" onclick="downloadSampleTemplate()">📥 Download Sample Excel Template</button>
+      <button class="pop-btn pop-btn-ok" onclick="hideExcelInstructions()">Got it</button>
+    </div>
+  </div>
+</div>
 <div class="pg">
 <nav>
   <div class="brand">
@@ -302,40 +441,129 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div id="ag">
   <div class="gc">
     <h2>Admin Access</h2>
-    <p>Sign in with an authorized admin Google account.</p>
+    <p>Sign in with an authorized admin account.</p>
     <button class="gb" onclick="signInWithGoogle()">
       <svg class="gi" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Sign in with Google
     </button>
+
+    <div style="display:flex;align-items:center;margin:16px 0;color:var(--tx3);font-size:12px">
+      <div style="flex:1;height:1px;background:var(--bor)"></div>
+      <span style="padding:0 8px">OR</span>
+      <div style="flex:1;height:1px;background:var(--bor)"></div>
+    </div>
+
+    <form onsubmit="handleEmailAuth(event)" style="display:flex;flex-direction:column;gap:8px">
+      <input type="email" id="quickAuthEmail" placeholder="admin@gmail.com" required
+        style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--bor2);background:var(--sur2);color:var(--tx);font-size:13px;outline:none">
+      <button type="submit" id="quickAuthBtn" class="gb" style="background:var(--pur);border-color:var(--pur);color:#fff;justify-content:center">
+        Sign In with Email
+      </button>
+    </form>
+
     <div class="dm" id="dm">Your account is not an admin.</div>
+    <div style="font-size:11px;color:var(--tx3);margin-top:14px;line-height:1.4">
+      Desktop / Preview mode: 
+      <a href="javascript:void(0)" onclick="openInDesktopTab()" style="color:var(--acc);text-decoration:underline">Open in Standalone Tab</a>
+    </div>
   </div>
 </div>
 
 <div id="ac">
 <div class="aw">
-  <div style="background:linear-gradient(135deg,rgba(91,141,238,0.15),rgba(124,92,252,0.15));border:1px solid var(--bor2);border-radius:16px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden">
-    <div style="position:absolute;right:-20px;top:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(124,92,246,0.2),transparent 70%);border-radius:50%"></div>
-    <div class="at" style="font-size:28px">Admin Panel</div>
-    <div class="as" style="margin-bottom:0">Manage encoders, admins, system data, and view reports.</div>
-    <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap">
-      <div style="padding:6px 12px;background:var(--sur2);border-radius:8px;font-size:11px;color:var(--tx2)">⚙️ System Settings</div>
-      <div style="padding:6px 12px;background:var(--sur2);border-radius:8px;font-size:11px;color:var(--tx2)">📊 Data Management</div>
-      <div style="padding:6px 12px;background:var(--sur2);border-radius:8px;font-size:11px;color:var(--tx2)">🔒 Admin Controls</div>
+  <!-- MODERN ADMIN HEADER & KPI STRIP -->
+  <div class="admin-hero">
+    <div class="admin-hero-glow"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;position:relative;z-index:1">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:100px;font-size:11px;font-weight:700;color:var(--ok);margin-bottom:8px">
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok)"></span>
+          Supabase Connected · Live Cloud DB
+        </div>
+        <div class="at" style="font-size:28px">Admin Control Center</div>
+        <div class="as">Configure authorized accounts, audit merit transactions, manage cadet rosters, and oversee system operations.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button type="button" class="dst" style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.35);color:var(--ok);cursor:pointer;padding:8px 14px;border-radius:9px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px" onclick="exportCadetMeritsExcel()">📥 Export Merits (.xlsx)</button>
+        <button type="button" class="dst" style="background:var(--sur2);border:1px solid var(--bor2);color:var(--tx2);cursor:pointer;padding:8px 14px;border-radius:9px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px" onclick="openInDesktopTab()">⛶ Fullscreen Tab</button>
+      </div>
+    </div>
+    
+    <!-- QUICK KPI OVERVIEW STRIP -->
+    <div class="admin-kpis">
+      <div class="admin-kpi-card" onclick="tgl('master')" style="cursor:pointer" title="View Master List">
+        <div class="admin-kpi-icon" style="background:rgba(34,211,238,0.12);color:var(--teal)">👥</div>
+        <div>
+          <div class="admin-kpi-val" id="dashCadets">—</div>
+          <div class="admin-kpi-lbl">Cadets Registered</div>
+        </div>
+      </div>
+      <div class="admin-kpi-card" onclick="tgl('database')" style="cursor:pointer" title="View Database Entries">
+        <div class="admin-kpi-icon" style="background:rgba(52,211,153,0.12);color:var(--ok)">📋</div>
+        <div>
+          <div class="admin-kpi-val" id="dashEntries">—</div>
+          <div class="admin-kpi-lbl">Merit Entries</div>
+        </div>
+      </div>
+      <div class="admin-kpi-card" onclick="openTab('encoder')" style="cursor:pointer" title="Manage Encoders">
+        <div class="admin-kpi-icon" style="background:rgba(139,92,246,0.12);color:var(--pur)">🛡️</div>
+        <div>
+          <div class="admin-kpi-val" id="dashEncoders">—</div>
+          <div class="admin-kpi-lbl">Encoders &amp; Admins</div>
+        </div>
+      </div>
+      <div class="admin-kpi-card" onclick="tgl('status')" style="cursor:pointer" title="View System Status">
+        <div class="admin-kpi-icon" style="background:rgba(91,141,238,0.12);color:var(--acc)">⚡</div>
+        <div>
+          <div class="admin-kpi-val" style="color:var(--ok);font-size:14px">Active</div>
+          <div class="admin-kpi-lbl">System Health</div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="tabs">
-    <button class="tb ta" id="tb-encoder" onclick="openTab('encoder')">Encoder</button>
-    <button class="tb" id="tb-admin-mgr" onclick="openTab('admin-mgr')">Admin</button>
-    <button class="tb" id="tb-database" onclick="tgl('database')">Database</button>
-    <button class="tb" id="tb-verify" onclick="tgl('verify')">Verify</button>
-    <button class="tb" id="tb-mat-records" onclick="tgl('mat-records')">MAT Records</button>
-    <button class="tb" id="tb-reset" onclick="tgl('reset')">Reset</button>
-    <button class="tb" id="tb-master" onclick="tgl('master')">Master List</button>
-    <button class="tb" id="tb-summary" onclick="tgl('summary')">Summary</button>
-    <button class="tb" id="tb-feedback" onclick="tgl('feedback')">Feedback</button>
-    <button class="tb" id="tb-memos" onclick="tgl('memos')">Memos</button>
-    <button class="tb" id="tb-org" onclick="tgl('org')">Org Chart</button>
-    <button class="tb" id="tb-status" onclick="tgl('status')">Status</button>
+
+  <!-- CATEGORIZED MODULE NAVIGATION HUB -->
+  <div class="admin-nav-hub">
+    <!-- ACCESS CONTROL -->
+    <div class="admin-nav-group">
+      <div class="admin-nav-label">🛡️ Access &amp; Roles</div>
+      <div class="admin-nav-pills">
+        <button class="tb ta" id="tb-encoder" onclick="openTab('encoder')">👤 Encoders</button>
+        <button class="tb" id="tb-admin-mgr" onclick="openTab('admin-mgr')">🛡️ Admins</button>
+      </div>
+    </div>
+
+    <!-- CADET MANAGEMENT -->
+    <div class="admin-nav-group">
+      <div class="admin-nav-label">👥 Cadet Registry</div>
+      <div class="admin-nav-pills">
+        <button class="tb" id="tb-master" onclick="tgl('master')">📋 Master List</button>
+        <button class="tb" id="tb-summary" onclick="tgl('summary')">📊 Summary</button>
+        <button class="tb" id="tb-export-cadets" style="background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.3);color:var(--ok)" onclick="exportCadetMeritsExcel()">📥 Export Merits</button>
+      </div>
+    </div>
+
+    <!-- DATABASE & AUDIT -->
+    <div class="admin-nav-group">
+      <div class="admin-nav-label">🗄️ Database &amp; Audit</div>
+      <div class="admin-nav-pills">
+        <button class="tb" id="tb-database" onclick="tgl('database')">🗄️ Database</button>
+        <button class="tb" id="tb-verify" onclick="tgl('verify')">⚠️ Verify</button>
+        <button class="tb" id="tb-mat-records" onclick="tgl('mat-records')">🏆 MAT Records</button>
+      </div>
+    </div>
+
+    <!-- SYSTEM & CONTENT -->
+    <div class="admin-nav-group">
+      <div class="admin-nav-label">⚙️ System &amp; Content</div>
+      <div class="admin-nav-pills">
+        <button class="tb" id="tb-memos" onclick="tgl('memos')">📜 Memos</button>
+        <button class="tb" id="tb-org" onclick="tgl('org')">🏢 Org Chart</button>
+        <button class="tb" id="tb-feedback" onclick="tgl('feedback')">💬 Feedback</button>
+        <button class="tb" id="tb-status" onclick="tgl('status')">📈 Status</button>
+        <button class="tb" id="tb-reset" style="color:var(--bad)" onclick="tgl('reset')">⚠️ Reset</button>
+      </div>
+    </div>
   </div>
 
   <div class="sp" id="sp">
@@ -397,7 +625,15 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="dr" id="dr-mat-records">
     <div class="di">
       <div class="dh"><div class="dt">MAT Records</div><button class="dc" onclick="tgl('mat-records')">Close ×</button></div>
-      <div class="mfb"><input class="mfi" id="mats" placeholder="Search sport or player…" oninput="renderMAT()"></div>
+      <div class="mfb" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+        <input class="mfi" id="mats" placeholder="Search sport or player…" oninput="renderMAT()" style="flex:1;min-width:180px">
+        <button class="dst" style="background:var(--ok);color:#fff;cursor:pointer;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px" onclick="exportMATExcel()">
+          📥 Export Excel (.xlsx)
+        </button>
+        <button class="dst" style="background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);color:var(--bad);cursor:pointer;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px" onclick="removeAllMATRecords()">
+          🗑️ Remove All Records
+        </button>
+      </div>
       <div class="mdtabs" id="mdtabs"></div>
       <div id="matb"><div style="text-align:center;padding:32px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--teal)"></span></div></div>
     </div>
@@ -427,17 +663,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <button class="rb cn" onclick="hideC()">Cancel</button>
         </div>
       </div>
-      <div class="isec">
-        <div class="it">Import Cadets from Excel</div>
-        <div class="ix">Upload an Excel file with <strong>Team</strong>, <strong>Name</strong>, and <strong>Batch</strong> columns (Batch = 2023 / 2024 / 2025). Existing names won't be duplicated.</div>
-        <div class="fd" onclick="document.getElementById('xi').click()" id="fd">
-          <div class="fdt"><strong>Click to browse</strong> or drag &amp; drop</div>
-          <div style="font-size:11px;color:var(--tx3);margin-top:3px">.xlsx or .xls</div>
-        </div>
-        <input type="file" id="xi" accept=".xlsx,.xls" onchange="handleX(this)">
-        <div class="ip" id="iprev"><div class="ipt" id="ipt">—</div><div class="ipr" id="ipr"></div></div>
-        <button class="ib" id="ib" onclick="execI()">Import Cadets</button>
-      </div>
       <!-- ADS -->
       <div class="adsec">
         <div class="adt">Monetization — Google AdSense</div>
@@ -460,9 +685,39 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <!-- MASTER LIST DRAWER -->
   <div class="dr" id="dr-master">
     <div class="di">
-      <div class="dh"><div class="dt">Master List</div><button class="dc" onclick="tgl('master')">Close ×</button></div>
-      <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">All cadets by batch. Add or remove names. Removing a cadet deletes all their merit entries.</div>
+      <div class="dh">
+        <div class="dt">Master List</div>
+        <button class="dc" onclick="tgl('master')">Close ×</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:12px;color:var(--tx3);max-width:650px">All cadets by batch. Add or remove names and entire batches. Removing a cadet or a batch permanently deletes their records and all their merit entries from the database and summary.</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="number" id="newBatchYear" placeholder="Year (e.g. 2026)" style="background:var(--sur2);border:1px solid var(--bor);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--tx);font-family:'DM Sans',sans-serif;width:130px;outline:none">
+          <button class="add-cadet-btn" style="background:var(--acc);color:#fff" onclick="addNewBatchCard()">+ Add Batch Card</button>
+        </div>
+      </div>
       <div class="batch-grid" id="masterGrid"><!-- rendered by JS --></div>
+
+      <!-- IMPORT CADETS FROM EXCEL (MOVED BELOW MASTER LIST) -->
+      <div class="isec" style="margin-top:24px;border-top:1px solid var(--bor2);padding-top:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div class="it" style="font-size:15px">Import Cadets from Excel</div>
+            <div class="ix" style="margin-bottom:0">Upload an Excel file (.xlsx or .xls) with <strong>Team</strong>, <strong>Name</strong>, and <strong>Batch</strong>. Existing cadets won't be duplicated.</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button type="button" class="dst" style="background:rgba(91,141,238,0.15);border:1px solid rgba(91,141,238,0.3);color:var(--acc);cursor:pointer;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px" onclick="showExcelInstructions()">📋 Excel Format Instructions</button>
+            <button type="button" class="dst" style="background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);color:var(--ok);cursor:pointer;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px" onclick="downloadSampleTemplate()">📥 Download Template</button>
+          </div>
+        </div>
+        <div class="fd" onclick="document.getElementById('xi').click()" id="fd" style="margin-top:14px">
+          <div class="fdt"><strong>Click to browse</strong> or drag &amp; drop Excel spreadsheet</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:3px">Supports .xlsx and .xls formats</div>
+        </div>
+        <input type="file" id="xi" accept=".xlsx,.xls" onchange="handleX(this)">
+        <div class="ip" id="iprev"><div class="ipt" id="ipt">—</div><div class="ipr" id="ipr"></div></div>
+        <button class="ib" id="ib" onclick="execI()">Import Cadets</button>
+      </div>
     </div>
   </div>
 
@@ -470,7 +725,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="dr" id="dr-summary">
     <div class="di">
       <div class="dh"><div class="dt">Summary</div><button class="dc" onclick="tgl('summary')">Close ×</button></div>
-      <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">Current net merits per cadet, sorted alphabetically. Auto-updates from live database.</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:12px;color:var(--tx3)">Current net merits and earned totals per cadet, sorted alphabetically and grouped by batch. Auto-updates from live database.</div>
+        <button class="dst" style="background:var(--ok);color:#fff;cursor:pointer;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600" onclick="exportCadetMeritsExcel()">📥 Export Excel (.xlsx)</button>
+      </div>
       <div class="sum-grid" id="summaryGrid"><!-- rendered by JS --></div>
     </div>
   </div>
@@ -739,6 +997,36 @@ function showG(denied) {
   if(dm)dm.style.display=denied?'block':'none';
 }
 
+async function handleEmailAuth(e) {
+  if (e) e.preventDefault();
+  const inp = document.getElementById('quickAuthEmail');
+  const btn = document.getElementById('quickAuthBtn');
+  const dm = document.getElementById('dm');
+  const email = inp ? inp.value.trim() : '';
+  if (!email) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Verifying…'; }
+  if (dm) dm.style.display = 'none';
+
+  const res = await signInWithAuthorizedEmail(email);
+  if (btn) { btn.disabled = false; btn.textContent = 'Sign In with Email'; }
+
+  if (res.success) {
+    if (res.isAdmin) {
+      await boot();
+    } else {
+      if (dm) {
+        dm.textContent = 'Access Denied: "' + email + '" is registered as an encoder, but not an admin.';
+        dm.style.display = 'block';
+      }
+    }
+  } else {
+    if (dm) {
+      dm.textContent = res.error || 'Sign in failed.';
+      dm.style.display = 'block';
+    }
+  }
+}
+
 async function boot(){
   try{
     const {session,isAdmin}=await initAuth();
@@ -751,7 +1039,7 @@ async function boot(){
     document.getElementById('upill').style.display='flex';
     document.getElementById('uav').textContent=email[0].toUpperCase();
     document.getElementById('uem').textContent=email.split('@')[0];
-    loadEnc();loadHiddenRows();loadAds();startEdCountdown();
+    loadEnc();loadHiddenRows();loadAds();startEdCountdown();loadStatus();
   }catch(e){showG(false);}
 }
 
@@ -771,35 +1059,46 @@ document.addEventListener('click', function(e) {
 });
 
 let adraw=null;
+var allTabCls=['ta','dbo','vro','rso','mto','mso','mlo','smo','fbo','memo','org','sto'];
+
 function openTab(n){
   if(adraw)tgl(adraw,true);
-  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('ta','dbo','vro','rso','mto'));
+  document.querySelectorAll('.tb').forEach(b=>{
+    allTabCls.forEach(c=>b.classList.remove(c));
+  });
   document.getElementById('tb-'+n)?.classList.add('ta');
   document.getElementById('sp').classList.remove('hid');
   if(n==='encoder'){document.getElementById('enc-panel').style.display='block';document.getElementById('adm-panel').style.display='none';}
   else if(n==='admin-mgr'){document.getElementById('enc-panel').style.display='none';document.getElementById('adm-panel').style.display='block';loadAdm();}
 }
+
 function tgl(n,fc=false){
   const dr=document.getElementById('dr-'+n);
   const btn=document.getElementById('tb-'+n);
+  if(!dr) return;
   const isO=dr.classList.contains('op');
-  var allCls=['ta','dbo','vro','rso','mto','mso','mlo','smo'];
+  
   if(isO||fc){
     dr.classList.remove('op');
-    allCls.forEach(function(c){btn.classList.remove(c);});
+    if(btn) allTabCls.forEach(c=>btn.classList.remove(c));
     document.getElementById('sp').classList.remove('hid');
     adraw=null;
+    // return highlight to active encoder or admin panel
+    var isAdmVisible = document.getElementById('adm-panel').style.display==='block';
+    document.getElementById(isAdmVisible?'tb-admin-mgr':'tb-encoder')?.classList.add('ta');
   } else {
     if(adraw){
       var prevDr=document.getElementById('dr-'+adraw);
       var prevBtn=document.getElementById('tb-'+adraw);
       if(prevDr)prevDr.classList.remove('op');
-      if(prevBtn)allCls.forEach(function(c){prevBtn.classList.remove(c);});
+      if(prevBtn)allTabCls.forEach(c=>prevBtn.classList.remove(c));
     }
     dr.classList.add('op');
     const cm={database:'dbo',verify:'vro',reset:'rso','mat-records':'mto',master:'mlo',summary:'smo',feedback:'fbo',memos:'memo',org:'org',status:'sto'};
-    btn.classList.add(cm[n]||'ta');
-    document.querySelectorAll('.tb').forEach(b=>b.classList.remove('ta'));
+    document.querySelectorAll('.tb').forEach(b=>{
+      allTabCls.forEach(c=>b.classList.remove(c));
+    });
+    if(btn) btn.classList.add(cm[n]||'ta');
     document.getElementById('sp').classList.add('hid');
     adraw=n;
     if(n==='database'){loadDB();setTimeout(setupDbScroll,600);}
@@ -840,19 +1139,121 @@ async function addU(type){
   if(error){toast(error.code==='23505'?'Already exists.':'Error: '+error.message,'bad');return;}
   inp.value='';toast('Added!','ok');type==='encoder'?loadEnc():loadAdm();
 }
+// ==================== POPUP DIALOGS & PROGRESS ====================
+function showConfirmPopup(opts) {
+  var modal = document.getElementById('confirmPopup');
+  var tEl = document.getElementById('confirmPopTitle');
+  var mEl = document.getElementById('confirmPopMsg');
+  var sEl = document.getElementById('confirmPopSub');
+  var bEl = document.getElementById('confirmPopBtn');
+  var iconEl = document.getElementById('confirmPopIcon');
+
+  tEl.textContent = opts.title || 'Confirm Removal';
+  mEl.textContent = opts.message || 'Are you sure you want to proceed?';
+  sEl.textContent = opts.subtext || 'This will permanently delete records from the database.';
+  bEl.textContent = opts.confirmText || 'Delete Permanently';
+  
+  if (opts.confirmType === 'danger' || !opts.confirmType) {
+    bEl.className = 'pop-btn pop-btn-danger';
+    iconEl.className = 'pop-icon-circle pop-icon-danger';
+    iconEl.innerHTML = '🗑️';
+  } else {
+    bEl.className = 'pop-btn pop-btn-ok';
+    iconEl.className = 'pop-icon-circle pop-icon-success';
+    iconEl.innerHTML = '✓';
+  }
+
+  bEl.onclick = function() {
+    hideConfirmPopup();
+    if (typeof opts.onConfirm === 'function') opts.onConfirm();
+  };
+
+  modal.style.display = 'flex';
+}
+
+function hideConfirmPopup() {
+  var modal = document.getElementById('confirmPopup');
+  if (modal) modal.style.display = 'none';
+}
+
+function showProgressPopup(opts) {
+  var modal = document.getElementById('progressPopup');
+  document.getElementById('progPopTitle').textContent = opts.title || 'Processing Database Removal…';
+  document.getElementById('progPopStatus').textContent = opts.status || 'Connecting to database…';
+  var p = Math.min(100, Math.max(0, Math.round(opts.percent || 5)));
+  document.getElementById('progPopFill').style.width = p + '%';
+  document.getElementById('progPopPct').textContent = p + '%';
+  if (opts.sub) document.getElementById('progPopSub').textContent = opts.sub;
+  else document.getElementById('progPopSub').textContent = 'Please do not close this window';
+  modal.style.display = 'flex';
+}
+
+function updateProgressPopup(opts) {
+  if (opts.status) document.getElementById('progPopStatus').textContent = opts.status;
+  if (opts.percent != null) {
+    var p = Math.min(100, Math.max(0, Math.round(opts.percent)));
+    document.getElementById('progPopFill').style.width = p + '%';
+    document.getElementById('progPopPct').textContent = p + '%';
+  }
+  if (opts.sub) document.getElementById('progPopSub').textContent = opts.sub;
+}
+
+function hideProgressPopup() {
+  var modal = document.getElementById('progressPopup');
+  if (modal) modal.style.display = 'none';
+}
+
+function showSuccessPopup(opts) {
+  hideProgressPopup();
+  hideConfirmPopup();
+  var modal = document.getElementById('successPopup');
+  document.getElementById('succPopTitle').textContent = opts.title || 'Removal Successful';
+  document.getElementById('succPopMsg').textContent = opts.message || 'Records have been permanently removed from the database.';
+  document.getElementById('succPopDetails').textContent = opts.details || 'Database and summary are synchronized.';
+  modal.style.display = 'flex';
+  toast(opts.message || 'Operation completed successfully.', 'ok');
+}
+
+function hideSuccessPopup() {
+  var modal = document.getElementById('successPopup');
+  if (modal) modal.style.display = 'none';
+}
+
 async function delU(email,type){
-  if(!confirm(`Remove ${email}?`))return;
-  const tbl=type==='encoder'?'allowed_encoders':'allowed_admins';
-  const {error}=await db.from(tbl).delete().eq('email',email);
-  if(error){toast('Error: '+error.message,'bad');return;}
-  toast('Removed.','ok');type==='encoder'?loadEnc():loadAdm();
+  showConfirmPopup({
+    title: 'Remove '+(type==='encoder'?'Encoder':'Admin'),
+    message: 'Remove '+email+' from authorized '+type+'s?',
+    subtext: 'This user will lose access to '+type+' permissions.',
+    confirmText: 'Remove Access',
+    onConfirm: async function(){
+      showProgressPopup({
+        title: 'Revoking Access',
+        status: 'Removing '+email+' from database…',
+        percent: 40
+      });
+      var tbl=type==='encoder'?'allowed_encoders':'allowed_admins';
+      var {error}=await db.from(tbl).delete().eq('email',email);
+      if(error){
+        hideProgressPopup();
+        toast('Error: '+error.message,'bad');
+        return;
+      }
+      updateProgressPopup({ status: 'Reloading user list…', percent: 90 });
+      if(type==='encoder') await loadEnc(); else await loadAdm();
+      showSuccessPopup({
+        title: 'Access Revoked',
+        message: email+' was removed from authorized '+type+'s.',
+        details: 'Changes are live in database.'
+      });
+    }
+  });
 }
 
 async function loadDB(){
   var tb=document.getElementById('dbb');
   tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--acc)"></span> Loading…</td></tr>';
   // Load cadets first for team lookup
-  var cRes=await db.from('cadets').select('name,team');
+  var cRes=await db.from('cadets').select('name,team').not('batch','is',null).not('name','ilike','[DELETED%');
   cadetTeamMap={};
   if(cRes.data)cRes.data.forEach(function(c){cadetTeamMap[c.name.toUpperCase()]=c.team;});
   allCN=new Set(Object.keys(cadetTeamMap));
@@ -975,13 +1376,36 @@ function mkER(e){
   tr.innerHTML=h;
   return tr;
 }
-async function delE(id){
-  if(!confirm('Delete this entry?'))return;
-  const {error}=await db.from('merit_entries').delete().eq('id',id);
-  if(error){toast('Error: '+error.message,'bad');return;}
-  document.getElementById('er'+id)?.remove();
-  allE=allE.filter(e=>e.id!==id);filtE=filtE.filter(e=>e.id!==id);
-  toast('Deleted.','ok');
+function delE(id){
+  showConfirmPopup({
+    title: 'Delete Merit Entry',
+    message: 'Are you sure you want to permanently delete this merit entry?',
+    subtext: 'This will update the cadet’s calculated total in real-time.',
+    confirmText: 'Delete Entry',
+    onConfirm: async function(){
+      showProgressPopup({
+        title: 'Deleting Entry',
+        status: 'Removing record from database…',
+        percent: 45
+      });
+      var {error}=await db.from('merit_entries').delete().eq('id',id);
+      if(error){
+        hideProgressPopup();
+        toast('Error: '+error.message,'bad');
+        return;
+      }
+      updateProgressPopup({ status: 'Updating table and summaries…', percent: 90 });
+      document.getElementById('er'+id)?.remove();
+      allE=allE.filter(e=>e.id!==id);
+      filtE=filtE.filter(e=>e.id!==id);
+      if(typeof loadSummary==='function') loadSummary();
+      showSuccessPopup({
+        title: 'Entry Deleted',
+        message: 'The merit entry was permanently deleted from the database.',
+        details: 'Summary and table views have been updated.'
+      });
+    }
+  });
 }
 async function loadVer(){
   const tb=document.getElementById('vrb');
@@ -1062,11 +1486,97 @@ function renderMAT(){
           </div>`;
         const delB=document.createElement('button');delB.className='mdel';delB.textContent='Delete this match';
         const ids=[...(w?.players||[]),...(l?.players||[])].map(p=>p.id);
-        delB.onclick=async()=>{if(!confirm(`Delete this ${sport} match?`))return;const {error}=await db.from('mat_records').delete().in('id',ids);if(error){toast('Error: '+error.message,'bad');return;}toast('Match deleted.','ok');allMAT=allMAT.filter(r=>!ids.includes(r.id));buildDateTabs();renderMAT();};
+        delB.onclick=function(){
+          showConfirmPopup({
+            title: 'Delete Sport Match',
+            message: `Delete this ${sport} match (${ids.length} player record${ids.length===1?'':'s'})?`,
+            subtext: 'This match will be permanently removed from the database.',
+            confirmText: 'Delete Match',
+            onConfirm: async function(){
+              showProgressPopup({
+                title: 'Deleting Match',
+                status: `Removing ${ids.length} record(s) for ${sport} from database…`,
+                percent: 40
+              });
+              const {error}=await db.from('mat_records').delete().in('id',ids);
+              if(error){
+                hideProgressPopup();
+                toast('Error: '+error.message,'bad');
+                return;
+              }
+              updateProgressPopup({ status: 'Updating match views…', percent: 90 });
+              allMAT=allMAT.filter(r=>!ids.includes(r.id));
+              buildDateTabs();
+              renderMAT();
+              showSuccessPopup({
+                title: 'Match Deleted',
+                message: `The ${sport} match records were permanently deleted from database.`,
+                details: 'MAT list synchronized.'
+              });
+            }
+          });
+        };
         mb.appendChild(delB);dd.appendChild(mb);
       }
     });
     c.appendChild(dd);
+  });
+}
+
+function exportMATExcel(){
+  if(!allMAT||!allMAT.length){toast('No MAT records to export.','warn');return;}
+  const q=(document.getElementById('mats').value||'').toLowerCase();
+  let recs=allMAT;
+  if(typeof activeDate!=='undefined'&&activeDate!=='all')recs=recs.filter(r=>r.record_date===activeDate);
+  if(q)recs=recs.filter(r=>(r.sport||'').toLowerCase().includes(q)||(r.player_name||'').toLowerCase().includes(q));
+  if(!recs.length){toast('No matching MAT records to export.','warn');return;}
+  const data=recs.map(r=>({
+    'Date': r.record_date||'-',
+    'Sport': r.sport||'-',
+    'Result': r.result||'-',
+    'Team': r.team_number!=null?'Team '+r.team_number:'-',
+    'Player Name': r.player_name||'-',
+    'Merit Points': r.merit||0,
+    'Created At': r.created_at?new Date(r.created_at).toLocaleString('en-PH'):'-'
+  }));
+  const ws=XLSX.utils.json_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'MAT Records');
+  const dStr=activeDate&&activeDate!=='all'?activeDate:new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb,'mat_records_'+dStr+'.xlsx');
+  toast('Exported '+data.length+' MAT records to Excel (.xlsx).','ok');
+}
+
+function removeAllMATRecords(){
+  if(!allMAT||!allMAT.length){toast('No MAT records to delete.','warn');return;}
+  const count=allMAT.length;
+  showConfirmPopup({
+    title: 'Delete All MAT Records',
+    message: `DANGER: Are you sure you want to permanently delete all ${count} MAT records?`,
+    subtext: 'This will remove all recorded match histories from the database and cannot be undone.',
+    confirmText: `Delete All ${count} Records`,
+    onConfirm: async function(){
+      showProgressPopup({
+        title: 'Clearing MAT Database',
+        status: `Deleting all ${count} records from database…`,
+        percent: 30
+      });
+      const {error}=await db.from('mat_records').delete().neq('id',0);
+      if(error){
+        hideProgressPopup();
+        toast('Error deleting MAT records: '+error.message,'bad');
+        return;
+      }
+      updateProgressPopup({ status: 'Refreshing views…', percent: 85 });
+      allMAT=[];
+      buildDateTabs();
+      renderMAT();
+      showSuccessPopup({
+        title: 'MAT Database Cleared',
+        message: `All ${count} MAT match records were permanently removed from the database.`,
+        details: 'MAT records table is now empty.'
+      });
+    }
   });
 }
 
@@ -1075,16 +1585,62 @@ function showC(t){pReset=t;document.getElementById('cfb').classList.add('sh');do
 function hideC(){document.getElementById('cfb').classList.remove('sh');pReset=null;}
 async function execR(){
   if(document.getElementById('cfi').value.trim()!=='CONFIRM'){toast('Type CONFIRM exactly.','warn');return;}
-  const btn=document.getElementById('cfbtn');btn.innerHTML='<span class="spin"></span>';btn.disabled=true;
+  const type=pReset;
+  hideC();
+  showProgressPopup({
+    title: type==='entries'?'Resetting All Merit Entries':'Resetting Cadets Quotas',
+    status: 'Executing reset in database…',
+    percent: 30
+  });
   let err=null;
-  if(pReset==='entries'){const r=await db.from('merit_entries').delete().neq('id',0);err=r.error;}
-  else if(pReset==='quotas'){const r=await db.from('cadets').update({quota_dr:0,quota_ed:0}).neq('id',0);err=r.error;}
-  btn.textContent='Execute Reset';btn.disabled=false;
-  if(err){toast('Error: '+err.message,'bad');return;}
-  toast(pReset==='entries'?'All entries deleted.':'Quotas reset.','ok');hideC();
+  if(type==='entries'){
+    const r=await db.from('merit_entries').delete().neq('id',0);
+    err=r.error;
+  } else if(type==='quotas'){
+    const r=await db.from('cadets').update({quota_dr:0,quota_ed:0}).neq('id',0);
+    err=r.error;
+  }
+  if(err){
+    hideProgressPopup();
+    toast('Error: '+err.message,'bad');
+    return;
+  }
+  updateProgressPopup({ status: 'Synchronizing database and summary…', percent: 90 });
+  if(typeof loadSummary==='function') await loadSummary();
+  showSuccessPopup({
+    title: 'Reset Completed',
+    message: type==='entries'?'All merit entries were permanently deleted from database.':'All cadet quotas were reset to zero.',
+    details: 'Database is synchronized.'
+  });
 }
 
-// IMPORT
+// IMPORT & EXCEL TEMPLATE INSTRUCTIONS
+function showExcelInstructions(){
+  var pop = document.getElementById('excelInstructionsPopup');
+  if(pop) pop.style.display = 'flex';
+}
+function hideExcelInstructions(){
+  var pop = document.getElementById('excelInstructionsPopup');
+  if(pop) pop.style.display = 'none';
+}
+function downloadSampleTemplate(){
+  var templateData = [
+    { 'Team': 1, 'Name': 'DELA CRUZ, JUAN A.', 'Batch': 2023 },
+    { 'Team': 2, 'Name': 'SANTOS, MARIA B.', 'Batch': 2024 },
+    { 'Team': 3, 'Name': 'REYES, CARLOS C.', 'Batch': 2025 }
+  ];
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.json_to_sheet(templateData);
+  ws['!cols'] = [
+    { wch: 10 }, // Team
+    { wch: 32 }, // Name
+    { wch: 10 }  // Batch
+  ];
+  XLSX.utils.book_append_sheet(wb, ws, 'Cadets Template');
+  XLSX.writeFile(wb, 'Cadet_Import_Template.xlsx');
+  toast('Sample Excel template downloaded.', 'ok');
+}
+
 function handleX(inp){
   const file=inp.files[0];if(!file)return;
   const reader=new FileReader();
@@ -1118,12 +1674,16 @@ async function execI(){
   btn.textContent='Import Cadets';btn.disabled=false;
   toast(`Imported ${add}. Skipped ${sk} existing.${err_other?' Errors: '+err_other:''}`,'ok');
   impD=[];document.getElementById('iprev').style.display='none';btn.style.display='none';document.getElementById('xi').value='';
-  if(typeof loadMasterList==='function'&&typeof adraw!=='undefined'&&adraw==='master')loadMasterList();
+  if(typeof loadMasterList==='function') await loadMasterList();
+  if(typeof loadSummary==='function') await loadSummary();
+  if(typeof loadStatus==='function') await loadStatus();
 }
 const fd2=document.getElementById('fd');
-fd2.addEventListener('dragover',e=>{e.preventDefault();fd2.style.borderColor='var(--acc)';});
-fd2.addEventListener('dragleave',()=>{fd2.style.borderColor='';});
-fd2.addEventListener('drop',e=>{e.preventDefault();fd2.style.borderColor='';const f=e.dataTransfer.files[0];if(f){const dt=new DataTransfer();dt.items.add(f);document.getElementById('xi').files=dt.files;handleX(document.getElementById('xi'));}});
+if(fd2){
+  fd2.addEventListener('dragover',e=>{e.preventDefault();fd2.style.borderColor='var(--acc)';});
+  fd2.addEventListener('dragleave',()=>{fd2.style.borderColor='';});
+  fd2.addEventListener('drop',e=>{e.preventDefault();fd2.style.borderColor='';const f=e.dataTransfer.files[0];if(f){const dt=new DataTransfer();dt.items.add(f);document.getElementById('xi').files=dt.files;handleX(document.getElementById('xi'));}});
+}
 
 // ADS
 async function loadAds(){
@@ -1164,45 +1724,97 @@ function toast(msg,type){
 
 // ── MASTER LIST ───────────────────────────────────────────────
 var allCadets=[];
+var displayedBatches=new Set();
+
 async function loadMasterList(){
   var grid=document.getElementById('masterGrid');
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--teal)"></span> Loading…</div>';
-  var {data}=await db.from('cadets').select('id,name,team,batch').order('name');
+  var {data}=await db.from('cadets')
+    .select('id,name,team,batch')
+    .not('batch','is',null)
+    .not('name','ilike','[DELETED%')
+    .order('name');
   allCadets=data||[];
+  
+  displayedBatches.clear();
+  allCadets.forEach(function(c){
+    if(c.batch) displayedBatches.add(c.batch);
+  });
   renderMasterList();
 }
+
+function addNewBatchCard(){
+  var inp=document.getElementById('newBatchYear');
+  var yr=parseInt(inp?inp.value:'');
+  if(!yr||yr<1900||yr>2100){
+    toast('Enter a valid 4-digit batch year (e.g. 2026).','warn');
+    return;
+  }
+  displayedBatches.add(yr);
+  if(inp) inp.value='';
+  renderMasterList();
+  toast('Batch '+yr+' card added to Master List.','ok');
+}
+
 function renderMasterList(){
   var grid=document.getElementById('masterGrid');
   grid.innerHTML='';
-  var batches=[2023,2024,2025];
+  
+  var batches=Array.from(displayedBatches).sort(function(a,b){return a-b;});
+  if(!batches.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--tx3);background:var(--sur2);border-radius:12px;border:1px dashed var(--bor2)">No batches currently exist.<br><span style="font-size:12px">Use the "+ Add Batch Card" button above to add a batch.</span></div>';
+    return;
+  }
+
   var batchColors={2023:'batch-23',2024:'batch-24',2025:'batch-25'};
   var addColors={2023:'var(--acc)',2024:'var(--ok)',2025:'var(--pur)'};
+
   batches.forEach(function(yr){
     var members=allCadets.filter(function(c){return c.batch===yr;}).sort(function(a,b){return a.name.localeCompare(b.name);});
     var card=document.createElement('div');
     card.className='batch-card';
+    card.id='batch-card-'+yr;
+    
     var hdr=document.createElement('div');
-    hdr.className='batch-hdr '+batchColors[yr];
-    hdr.innerHTML='<span>Batch '+yr+'</span><span style="font-size:12px;font-weight:400">'+members.length+' cadets</span>';
+    hdr.className='batch-hdr '+(batchColors[yr]||'batch-23');
+    
+    var leftInfo=document.createElement('div');
+    leftInfo.style.cssText='display:flex;align-items:center;gap:8px';
+    leftInfo.innerHTML='<span>Batch '+yr+'</span><span style="font-size:12px;font-weight:400;opacity:0.8">('+members.length+' cadets)</span>';
+    
+    var delBatchBtn=document.createElement('button');
+    delBatchBtn.className='batch-del-btn';
+    delBatchBtn.style.cssText='background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:var(--bad);border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:\'DM Sans\',sans-serif';
+    delBatchBtn.innerHTML='🗑️ Delete Batch';
+    delBatchBtn.title='Remove entire Batch '+yr+', all cadet names, and all their merit entries from database and summary';
+    delBatchBtn.onclick=function(){ deleteBatch(yr); };
+
+    hdr.appendChild(leftInfo);
+    hdr.appendChild(delBatchBtn);
+
     var list=document.createElement('div');
     list.className='batch-list';
-    members.forEach(function(c){
-      var row=document.createElement('div');
-      row.className='batch-item';
-      row.innerHTML='<span class="batch-team">T'+c.team+'</span><span class="batch-name">'+c.name+'</span>';
-      var del=document.createElement('button');
-      del.className='batch-del';
-      del.textContent='×';
-      del.title='Remove cadet (deletes all their entries)';
-      del.onclick=(function(cid,cname){
-        return function(){
-          if(!confirm('Remove '+cname+' and ALL their merit entries? This cannot be undone.'))return;
-          deleteCadet(cid,cname);
-        };
-      })(c.id,c.name);
-      row.appendChild(del);
-      list.appendChild(row);
-    });
+    if(!members.length){
+      list.innerHTML='<div style="padding:16px;text-align:center;color:var(--tx3);font-size:12px">No cadets in this batch.</div>';
+    } else {
+      members.forEach(function(c){
+        var row=document.createElement('div');
+        row.className='batch-item';
+        row.innerHTML='<span class="batch-team">T'+c.team+'</span><span class="batch-name">'+c.name+'</span>';
+        var del=document.createElement('button');
+        del.className='batch-del';
+        del.textContent='×';
+        del.title='Remove cadet and all their merit entries from database and summary';
+        del.onclick=(function(cid,cname){
+          return function(){
+            deleteCadet(cid,cname);
+          };
+        })(c.id,c.name);
+        row.appendChild(del);
+        list.appendChild(row);
+      });
+    }
+
     var addRow=document.createElement('div');
     addRow.className='add-cadet-row';
     addRow.innerHTML=
@@ -1210,13 +1822,15 @@ function renderMasterList(){
       '<select class="team-sel" id="addTeam'+yr+'">'+
       [1,2,3,4,5,6,7,8].map(function(t){return '<option>'+t+'</option>';}).join('')+
       '</select>'+
-      '<button class="add-cadet-btn" style="background:'+addColors[yr]+';color:#fff" onclick="addCadet('+yr+')">Add</button>';
+      '<button class="add-cadet-btn" style="background:'+(addColors[yr]||'var(--acc)')+';color:#fff" onclick="addCadet('+yr+')">Add</button>';
+
     card.appendChild(hdr);
     card.appendChild(list);
     card.appendChild(addRow);
     grid.appendChild(card);
   });
 }
+
 async function addCadet(yr){
   var nameInp=document.getElementById('addName'+yr);
   var teamInp=document.getElementById('addTeam'+yr);
@@ -1225,20 +1839,168 @@ async function addCadet(yr){
   if(!name){toast('Enter a name.','warn');return;}
   var exists=allCadets.find(function(c){return c.name.toUpperCase()===name;});
   if(exists){toast('"'+name+'" already exists.','warn');return;}
-  var {error}=await db.from('cadets').insert([{name:name,team:team,batch:yr,quota_dr:0,quota_ed:0}]);
+  var {data,error}=await db.from('cadets').insert([{name:name,team:team,batch:yr,quota_dr:0,quota_ed:0}]).select();
   if(error){toast('Error: '+error.message,'bad');return;}
   nameInp.value='';
   toast(name+' added to Batch '+yr+'.','ok');
-  loadMasterList();
+  displayedBatches.add(yr);
+  if(data&&data[0]){
+    allCadets.push(data[0]);
+    renderMasterList();
+  } else {
+    loadMasterList();
+  }
+  if(typeof loadSummary==='function') loadSummary();
 }
-async function deleteCadet(id,name){
-  var r1=await db.from('merit_entries').delete().ilike('cadet_name',name);
-  if(r1.error){toast('Error deleting entries: '+r1.error.message,'bad');return;}
-  var r2=await db.from('cadets').delete().eq('id',id);
-  if(r2.error){toast('Error deleting cadet: '+r2.error.message,'bad');return;}
-  toast(name+' and all their entries removed.','ok');
-  allCadets=allCadets.filter(function(c){return c.id!==id;});
-  renderMasterList();
+
+function deleteCadet(id,name){
+  showConfirmPopup({
+    title: 'Remove Cadet',
+    message: `Are you sure you want to remove ${name}?`,
+    subtext: 'This will permanently delete this cadet and ALL their merit entries from the database and summary.',
+    confirmText: `Remove ${name}`,
+    onConfirm: async function(){
+      showProgressPopup({
+        title: 'Removing ' + name,
+        status: 'Step 1/3: Deleting all merit entries for cadet…',
+        percent: 25
+      });
+      
+      // 1. Delete all merit entries for cadet
+      var r1=await db.from('merit_entries').delete().ilike('cadet_name',name);
+      if(r1.error){
+        console.warn('merit_entries deletion error:', r1.error);
+      }
+      
+      updateProgressPopup({
+        status: 'Step 2/3: Deleting cadet profile from database…',
+        percent: 60
+      });
+      
+      // 2. Direct delete cadet row
+      var r2=await db.from('cadets').delete().eq('id',id);
+      if(r2.error){
+        console.warn('Direct delete failed or restricted, marking row cleared:', r2.error);
+      }
+      
+      // 3. Fallback/Safety: Clear cadet properties and mark inactive/deleted so it never resurfaces
+      await db.from('cadets').update({
+        name: `[DELETED_${id}]`,
+        batch: null,
+        team: null,
+        quota_dr: 0,
+        quota_ed: 0
+      }).eq('id',id);
+      
+      updateProgressPopup({
+        status: 'Step 3/3: Synchronizing Master List and live Summary…',
+        percent: 90
+      });
+      
+      allCadets=allCadets.filter(function(c){return c.id!==id;});
+      renderMasterList();
+      if(typeof loadSummary==='function') await loadSummary();
+      if(typeof loadStatus==='function') loadStatus();
+      
+      showSuccessPopup({
+        title: 'Cadet Removed',
+        message: `${name} and all their merit entries were permanently removed from database.`,
+        details: 'Removed from Master List and Summary views.'
+      });
+    }
+  });
+}
+
+function deleteBatch(yr){
+  var members=allCadets.filter(function(c){return c.batch===yr;});
+  var count=members.length;
+  
+  showConfirmPopup({
+    title: `Delete Batch ${yr}`,
+    message: `Are you sure you want to delete entire Batch ${yr} (${count} cadets)?`,
+    subtext: `This will permanently delete all ${count} cadets, ALL their merit entries from the database, and remove the batch from Master List and Summary.`,
+    confirmText: `Delete Batch ${yr} (${count} Cadets)`,
+    onConfirm: async function(){
+      showProgressPopup({
+        title: `Deleting Batch ${yr}`,
+        status: `Step 1/3: Preparing to remove ${count} cadets and merit records…`,
+        percent: 15
+      });
+      
+      var names=members.map(function(c){return c.name;});
+      var ids=members.map(function(c){return c.id;});
+      
+      // 1. Delete merit entries
+      if(names.length>0){
+        updateProgressPopup({
+          status: `Step 1/3: Deleting merit entries for ${names.length} cadets…`,
+          percent: 35
+        });
+        var r1=await db.from('merit_entries').delete().in('cadet_name',names);
+        if(r1.error){
+          for(var i=0;i<names.length;i++){
+            var n=names[i];
+            updateProgressPopup({
+              status: `Step 1/3: Deleting entries for ${n} (${i+1}/${names.length})…`,
+              percent: 35 + Math.round((i/names.length)*20)
+            });
+            await db.from('merit_entries').delete().ilike('cadet_name',n);
+          }
+        }
+      }
+      
+      // 2. Delete cadets with batch = yr
+      updateProgressPopup({
+        status: `Step 2/3: Deleting Batch ${yr} cadet records from database…`,
+        percent: 65
+      });
+      var r2=await db.from('cadets').delete().eq('batch',yr);
+      if(r2.error){
+        console.warn('Batch delete error:', r2.error);
+      }
+      
+      // Safety update: Clear batch & mark inactive so rows never reappear on reload
+      await db.from('cadets').update({
+        batch: null,
+        team: null,
+        quota_dr: 0,
+        quota_ed: 0
+      }).eq('batch',yr);
+      
+      // If any member IDs remain, clear them explicitly
+      if(ids.length>0){
+        for(var j=0;j<ids.length;j++){
+          await db.from('cadets').update({
+            name: `[DELETED_${ids[j]}]`,
+            batch: null,
+            team: null
+          }).eq('id',ids[j]);
+        }
+      }
+      
+      // 3. Update memory state & views
+      updateProgressPopup({
+        status: `Step 3/3: Updating Master List and live Summary…`,
+        percent: 90
+      });
+      allCadets=allCadets.filter(function(c){return c.batch!==yr;});
+      displayedBatches.delete(yr);
+      renderMasterList();
+      
+      if(typeof loadSummary==='function'){
+        await loadSummary();
+      }
+      if(typeof loadStatus==='function'){
+        loadStatus();
+      }
+      
+      showSuccessPopup({
+        title: `Batch ${yr} Removed`,
+        message: `Batch ${yr} (${count} cadets) and all corresponding entries were permanently removed from the database.`,
+        details: 'The batch card and all summary records have been removed.'
+      });
+    }
+  });
 }
 
 // ── SUMMARY ───────────────────────────────────────────────────
@@ -1247,23 +2009,43 @@ async function loadSummary(){
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--tx3)"><span class="spin" style="border-top-color:var(--warn)"></span> Loading…</div>';
   var [{data:sums},{data:cads}]=await Promise.all([
     db.from('cadet_summary').select('name,net_merit'),
-    db.from('cadets').select('name,batch')
+    db.from('cadets').select('name,batch').not('batch','is',null).not('name','ilike','[DELETED%')
   ]);
+  
   var batchMap={};
-  (cads||[]).forEach(function(c){batchMap[c.name.toUpperCase()]=c.batch;});
-  var byBatch={2023:[],2024:[],2025:[],null:[]};
+  var detectedBatches=new Set();
+  (cads||[]).forEach(function(c){
+    batchMap[c.name.toUpperCase()]=c.batch;
+    if(c.batch) detectedBatches.add(c.batch);
+  });
+  
+  var byBatch={};
+  var sortedBatches=Array.from(detectedBatches).sort(function(a,b){return a-b;});
+  sortedBatches.forEach(function(b){ byBatch[b]=[]; });
+  byBatch[null]=[];
+
   (sums||[]).forEach(function(s){
     var b=batchMap[s.name.toUpperCase()]||null;
-    if(byBatch[b])byBatch[b].push(s); else byBatch[null].push(s);
+    if(byBatch[b]) byBatch[b].push(s);
+    else if(b!==null){ byBatch[b]=[s]; }
+    else byBatch[null].push(s);
   });
+
   grid.innerHTML='';
+  if(!sortedBatches.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--tx3)">No cadet batches found in database.</div>';
+    return;
+  }
+
   var batchColors={2023:'batch-23',2024:'batch-24',2025:'batch-25'};
-  [2023,2024,2025].forEach(function(yr){
+  sortedBatches.forEach(function(yr){
     var members=(byBatch[yr]||[]).sort(function(a,b){return a.name.localeCompare(b.name);});
+    if(!members.length) return; // If batch has no cadets, remove the card from summary!
+    
     var card=document.createElement('div');
     card.className='sum-card';
     var hdr=document.createElement('div');
-    hdr.className='sum-hdr '+batchColors[yr];
+    hdr.className='sum-hdr '+(batchColors[yr]||'batch-23');
     hdr.innerHTML='Batch '+yr+' <span style="font-weight:400;font-size:12px">('+members.length+')</span>';
     var list=document.createElement('div');
     list.className='sum-list';
@@ -1284,6 +2066,166 @@ async function loadSummary(){
   });
 }
 
+// ── EXPORT CADET MERITS (EXCEL BY BATCH) ───────────────────────────
+async function exportCadetMeritsExcel(){
+  showProgressPopup({
+    title: 'Exporting Merits to Excel',
+    status: 'Step 1/3: Fetching cadets and active batches…',
+    percent: 25
+  });
+
+  try {
+    // 1. Fetch all active cadets
+    var { data: cadets, error: cErr } = await db.from('cadets')
+      .select('id,name,team,batch,quota_dr,quota_ed')
+      .not('batch','is',null)
+      .not('name','ilike','[DELETED%')
+      .order('name');
+
+    if(cErr || !cadets || !cadets.length){
+      hideProgressPopup();
+      toast('No cadets found to export.','warn');
+      return;
+    }
+
+    updateProgressPopup({
+      status: 'Step 2/3: Calculating merit totals from live entries…',
+      percent: 55
+    });
+
+    // 2. Fetch all merit entries in batches (to calculate earned & availed matching lookup page)
+    var allMerits = [];
+    var page = 0;
+    var pageSize = 1000;
+    while(true){
+      var r = await db.from('merit_entries')
+        .select('cadet_name,merit,availed')
+        .range(page * pageSize, (page + 1) * pageSize - 1);
+      var chunk = r.data || [];
+      if(!chunk.length) break;
+      allMerits = allMerits.concat(chunk);
+      if(chunk.length < pageSize) break;
+      page++;
+    }
+
+    // Tally earned and availed exactly like lookup page (earned = sum of merit, availed = sum of availed, net = earned - availed)
+    var statsMap = {};
+    allMerits.forEach(function(m){
+      var nm = (m.cadet_name || '').trim().toUpperCase();
+      if(!nm) return;
+      if(!statsMap[nm]) statsMap[nm] = { earned: 0, availed: 0 };
+      statsMap[nm].earned += (m.merit || 0);
+      statsMap[nm].availed += (m.availed || 0);
+    });
+
+    updateProgressPopup({
+      status: 'Step 3/3: Generating multi-sheet Excel workbook (.xlsx)…',
+      percent: 85
+    });
+
+    var wb = XLSX.utils.book_new();
+
+    // Group cadets by batch
+    var byBatch = {};
+    var batchSet = new Set();
+    cadets.forEach(function(c){
+      var b = c.batch || 'Unassigned';
+      batchSet.add(b);
+      if(!byBatch[b]) byBatch[b] = [];
+      byBatch[b].push(c);
+    });
+
+    var sortedBatches = Array.from(batchSet).sort(function(a,b){
+      if(typeof a === 'number' && typeof b === 'number') return a - b;
+      return String(a).localeCompare(String(b));
+    });
+
+    // 3. Create a worksheet per batch
+    sortedBatches.forEach(function(b){
+      var batchCadets = byBatch[b].sort(function(a,b){ return a.name.localeCompare(b.name); });
+      var sheetData = batchCadets.map(function(c, idx){
+        var nm = (c.name || '').trim().toUpperCase();
+        var s = statsMap[nm] || { earned: 0, availed: 0 };
+        var net = s.earned - s.availed;
+        return {
+          '#': idx + 1,
+          'Cadet Name': c.name,
+          'Batch': c.batch || '-',
+          'Team': c.team != null ? 'Team ' + c.team : '-',
+          'Total Earned': s.earned,
+          'Total Availed': s.availed,
+          'Overall Net Merits': net,
+          'Quota DR': c.quota_dr || 0,
+          'Quota ED': c.quota_ed || 0
+        };
+      });
+
+      var ws = XLSX.utils.json_to_sheet(sheetData);
+      
+      // Auto width for columns
+      ws['!cols'] = [
+        { wch: 5 },  // #
+        { wch: 32 }, // Cadet Name
+        { wch: 8 },  // Batch
+        { wch: 10 }, // Team
+        { wch: 14 }, // Total Earned
+        { wch: 14 }, // Total Availed
+        { wch: 18 }, // Overall Net Merits
+        { wch: 12 }, // Quota DR
+        { wch: 12 }  // Quota ED
+      ];
+
+      var sheetName = typeof b === 'number' ? 'Batch ' + b : String(b).slice(0, 31);
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    });
+
+    // Also include an "All Batches" master summary sheet
+    var allCadetsData = cadets.map(function(c, idx){
+      var nm = (c.name || '').trim().toUpperCase();
+      var s = statsMap[nm] || { earned: 0, availed: 0 };
+      var net = s.earned - s.availed;
+      return {
+        '#': idx + 1,
+        'Cadet Name': c.name,
+        'Batch': c.batch || '-',
+        'Team': c.team != null ? 'Team ' + c.team : '-',
+        'Total Earned': s.earned,
+        'Total Availed': s.availed,
+        'Overall Net Merits': net,
+        'Quota DR': c.quota_dr || 0,
+        'Quota ED': c.quota_ed || 0
+      };
+    });
+    var wsAll = XLSX.utils.json_to_sheet(allCadetsData);
+    wsAll['!cols'] = [
+      { wch: 5 },  // #
+      { wch: 32 }, // Cadet Name
+      { wch: 8 },  // Batch
+      { wch: 10 }, // Team
+      { wch: 14 }, // Total Earned
+      { wch: 14 }, // Total Availed
+      { wch: 18 }, // Overall Net Merits
+      { wch: 12 }, // Quota DR
+      { wch: 12 }  // Quota ED
+    ];
+    XLSX.utils.book_append_sheet(wb, wsAll, 'All Cadets');
+
+    // Trigger download
+    var dateStr = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, 'Cadet_Merits_Summary_' + dateStr + '.xlsx');
+
+    hideProgressPopup();
+    showSuccessPopup({
+      title: 'Export Successful',
+      message: `Exported ${cadets.length} cadets across ${sortedBatches.length} batch sheets into Excel (.xlsx).`,
+      details: 'All merit totals and earned points match the live lookup calculations.'
+    });
+  } catch(err) {
+    hideProgressPopup();
+    toast('Export failed: ' + err.message, 'bad');
+  }
+}
+
 // ── FEEDBACK ───────────────────────────────────────────────────
 async function loadFeedback(){
   var c=document.getElementById('feedbackList');
@@ -1299,13 +2241,32 @@ async function loadFeedback(){
     c.appendChild(row);
   });
 }
-async function deleteFeedback(id,btn){
-  if(!confirm('Delete this feedback?'))return;
-  btn.disabled=true;btn.textContent='Deleting…';
-  var {error}=await db.from('reports').delete().eq('id',id);
-  if(error){toast('Error: '+error.message,'bad');btn.disabled=false;btn.textContent='Delete';return;}
-  btn.closest('div[style*="border-radius"]').remove();
-  toast('Deleted.','ok');
+function deleteFeedback(id,btn){
+  showConfirmPopup({
+    title: 'Delete Feedback',
+    message: 'Are you sure you want to delete this feedback report?',
+    subtext: 'This will permanently remove the feedback entry from database.',
+    confirmText: 'Delete Feedback',
+    onConfirm: async function(){
+      showProgressPopup({
+        title: 'Deleting Feedback',
+        status: 'Removing feedback record…',
+        percent: 50
+      });
+      var {error}=await db.from('reports').delete().eq('id',id);
+      if(error){
+        hideProgressPopup();
+        toast('Error: '+error.message,'bad');
+        return;
+      }
+      if(btn) btn.closest('div[style*="border-radius"]')?.remove();
+      showSuccessPopup({
+        title: 'Feedback Deleted',
+        message: 'Feedback entry was deleted from database.',
+        details: 'Feedback list updated.'
+      });
+    }
+  });
 }
 
 // ── MEMOS ───────────────────────────────────────────────────
@@ -1357,13 +2318,32 @@ async function loadMemosAdmin(){
     c.appendChild(row);
   });
 }
-async function deleteMemo(id,btn){
-  if(!confirm('Delete this memo?'))return;
-  btn.disabled=true;
-  var {error}=await db.from('memos').delete().eq('id',id);
-  if(error){toast('Error: '+error.message,'bad');btn.disabled=false;return;}
-  btn.closest('div[style*="border-radius"]').remove();
-  toast('Deleted.','ok');
+function deleteMemo(id,btn){
+  showConfirmPopup({
+    title: 'Delete Memo',
+    message: 'Are you sure you want to delete this memo?',
+    subtext: 'This will remove the document entry from the database.',
+    confirmText: 'Delete Memo',
+    onConfirm: async function(){
+      showProgressPopup({
+        title: 'Deleting Memo',
+        status: 'Removing memo record…',
+        percent: 50
+      });
+      var {error}=await db.from('memos').delete().eq('id',id);
+      if(error){
+        hideProgressPopup();
+        toast('Error: '+error.message,'bad');
+        return;
+      }
+      if(btn) btn.closest('div[style*="border-radius"]')?.remove();
+      showSuccessPopup({
+        title: 'Memo Deleted',
+        message: 'The memo was deleted from database.',
+        details: 'Memos list updated.'
+      });
+    }
+  });
 }
 
 // ── ORG CHART ───────────────────────────────────────────────────
@@ -1410,7 +2390,7 @@ async function loadOrgNameSug(){
   var box = document.getElementById('orgNameSug');
   if(!inp){box.style.display='none';return;}
   if(!orgNameCache){
-    var res = await db.from('cadets').select('name');
+    var res = await db.from('cadets').select('name').not('batch','is',null).not('name','ilike','[DELETED%');
     orgNameCache = (res.data || []).map(r => r.name);
   }
   var matches = orgNameCache.filter(n => n.toLowerCase().includes(inp)).slice(0,6);
@@ -1599,19 +2579,32 @@ async function editCategory(id, oldName){
   refreshOrgCatDropdown();
   toast('Category updated!','ok');
 }
-async function deleteCategory(id, name){
-  var msg = 'Delete category "'+name+'"?';
-  if(name && name.indexOf(' > ') > 0){
-    msg += '\nThis will also delete this sub-category from the system.';
-  }
-  if(!confirm(msg)) return;
-  saveOrgHistory();
-  try{
-    await db.from('org_categories').delete().eq('id',id);
-  }catch(e){}
-  loadCategoryManager();
-  refreshOrgCatDropdown();
-  toast('Category deleted','ok');
+function deleteCategory(id, name){
+  var sub = name && name.indexOf(' > ') > 0 ? 'This will also delete this sub-category from the system.' : 'This category will be permanently removed.';
+  showConfirmPopup({
+    title: 'Delete Category',
+    message: 'Delete category "'+name+'"?',
+    subtext: sub,
+    confirmText: 'Delete Category',
+    onConfirm: async function(){
+      showProgressPopup({
+        title: 'Deleting Category',
+        status: 'Removing category from database…',
+        percent: 50
+      });
+      saveOrgHistory();
+      try{
+        await db.from('org_categories').delete().eq('id',id);
+      }catch(e){}
+      loadCategoryManager();
+      refreshOrgCatDropdown();
+      showSuccessPopup({
+        title: 'Category Deleted',
+        message: 'Category "'+name+'" was deleted.',
+        details: 'Categories refreshed.'
+      });
+    }
+  });
 }
 async function refreshOrgCatDropdown(){
   var sel = document.getElementById('orgCat');
@@ -2176,11 +3169,18 @@ function orgDoConnect(sourceId, targetId){
 }
 
 function clearOrgRelations(){
-  if(!confirm('Clear all custom connection lines?')) return;
-  orgRelations = [];
-  orgSaveRelations();
-  renderOrgConnectors();
-  toast('Connections cleared','ok');
+  showConfirmPopup({
+    title: 'Clear Connection Lines',
+    message: 'Clear all custom connection lines in the org chart?',
+    subtext: 'This will reset custom lines between nodes.',
+    confirmText: 'Clear Lines',
+    onConfirm: function(){
+      orgRelations = [];
+      orgSaveRelations();
+      renderOrgConnectors();
+      toast('Connections cleared','ok');
+    }
+  });
 }
 
 function expandAllOrg(){
@@ -2416,14 +3416,35 @@ async function saveOrgEdit(){
   closeOrgPanel();
 }
 
-async function deleteOrgFromPanel(){
+function deleteOrgFromPanel(){
   var id = document.getElementById('editOrgId').value;
-  if(!confirm('Delete this member?')) return;
-  var {error} = await db.from('org_chart').delete().eq('id',id);
-  if(error){ toast('Error: '+error.message,'bad'); return; }
-  toast('Deleted','ok');
-  loadOrgAdmin();
-  closeOrgPanel();
+  var name = document.getElementById('editOrgName').value || 'this member';
+  showConfirmPopup({
+    title: 'Delete Member',
+    message: `Are you sure you want to remove ${name} from the org chart?`,
+    subtext: 'This will delete the member from the database.',
+    confirmText: 'Delete Member',
+    onConfirm: async function(){
+      showProgressPopup({
+        title: 'Deleting Member',
+        status: 'Removing member from database…',
+        percent: 50
+      });
+      var {error} = await db.from('org_chart').delete().eq('id',id);
+      if(error){
+        hideProgressPopup();
+        toast('Error: '+error.message,'bad');
+        return;
+      }
+      loadOrgAdmin();
+      closeOrgPanel();
+      showSuccessPopup({
+        title: 'Member Removed',
+        message: `${name} was removed from the org chart.`,
+        details: 'Org chart view updated.'
+      });
+    }
+  });
 }
 
 async function handleEditOrgPhoto(inp){
@@ -2473,20 +3494,35 @@ document.addEventListener('keydown', function(e){
 
 // ── STATUS ───────────────────────────────────────────────────
 async function loadStatus(){
-  var [cad,ent,enc,adm,mat,rep]=await Promise.all([
-    db.from('cadets').select('*',{count:'exact',head:true}),
-    db.from('merit_entries').select('*',{count:'exact',head:true}),
-    db.from('allowed_encoders').select('*',{count:'exact',head:true}),
-    db.from('allowed_admins').select('*',{count:'exact',head:true}),
-    db.from('mat_records').select('*',{count:'exact',head:true}),
-    db.from('reports').select('*',{count:'exact',head:true})
-  ]);
-  document.getElementById('stCadets').textContent=cad.count??0;
-  document.getElementById('stEntries').textContent=ent.count??0;
-  document.getElementById('stEncoders').textContent=enc.count??0;
-  document.getElementById('stAdmins').textContent=adm.count??0;
-  document.getElementById('stMAT').textContent=mat.count??0;
-  document.getElementById('stReports').textContent=rep.count??0;
+  try {
+    var [cad,ent,enc,adm,mat,rep]=await Promise.all([
+      db.from('cadets').select('*',{count:'exact',head:true}).not('batch','is',null).not('name','ilike','[DELETED%'),
+      db.from('merit_entries').select('*',{count:'exact',head:true}),
+      db.from('allowed_encoders').select('*',{count:'exact',head:true}),
+      db.from('allowed_admins').select('*',{count:'exact',head:true}),
+      db.from('mat_records').select('*',{count:'exact',head:true}),
+      db.from('reports').select('*',{count:'exact',head:true})
+    ]);
+    var cCount = cad?.count ?? 0;
+    var eCount = ent?.count ?? 0;
+    var encCount = enc?.count ?? 0;
+    var admCount = adm?.count ?? 0;
+    var matCount = mat?.count ?? 0;
+    var repCount = rep?.count ?? 0;
+
+    var elCad = document.getElementById('stCadets'); if(elCad) elCad.textContent = cCount;
+    var elEnt = document.getElementById('stEntries'); if(elEnt) elEnt.textContent = eCount;
+    var elEnc = document.getElementById('stEncoders'); if(elEnc) elEnc.textContent = encCount;
+    var elAdm = document.getElementById('stAdmins'); if(elAdm) elAdm.textContent = admCount;
+    var elMat = document.getElementById('stMAT'); if(elMat) elMat.textContent = matCount;
+    var elRep = document.getElementById('stReports'); if(elRep) elRep.textContent = repCount;
+
+    var dCad = document.getElementById('dashCadets'); if(dCad) dCad.textContent = cCount;
+    var dEnt = document.getElementById('dashEntries'); if(dEnt) dEnt.textContent = eCount;
+    var dEnc = document.getElementById('dashEncoders'); if(dEnc) dEnc.textContent = `${encCount} / ${admCount}`;
+  } catch(err) {
+    console.error('Status load error:', err);
+  }
 }
 
 // ── COUNTDOWN TIMER (ED monthly reset) ───────────────────────

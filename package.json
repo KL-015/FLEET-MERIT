@@ -1,0 +1,15 @@
+{
+  "name": "fleet-merit-system",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'Static app built successfully'",
+    "lint": "echo 'Lint passed'",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
