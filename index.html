@@ -410,19 +410,35 @@ document.getElementById('searchInput').addEventListener('keypress', function(e){
 // If Merit Store can't be reached, the numbers above stay as Fleet's own values.
 var MERIT_STORE_URL = 'https://meritstore-system.netlify.app';
 
+// Add ?debug=1 to the Fleet address to see where the quota numbers came from (or why they fell back).
+function quotaDebug(msg) {
+  if (location.search.indexOf('debug') === -1) return;
+  var el = document.getElementById('rQSrc');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'rQSrc';
+    el.style.cssText = 'font-size:11px;opacity:.7;padding:8px 14px;color:#9aa4b2;';
+    document.getElementById('resultCard').appendChild(el);
+  }
+  el.textContent = 'Quota source: ' + msg;
+}
+
 async function applyMeritStoreQuota(name) {
   try {
     var ctrl = new AbortController();
     var timer = setTimeout(function(){ ctrl.abort(); }, 5000);
     var r = await fetch(MERIT_STORE_URL + '/.netlify/functions/quota?name=' + encodeURIComponent(name), { signal: ctrl.signal, cache: 'no-store' });
     clearTimeout(timer);
-    if (!r.ok) return;
+    if (!r.ok) { quotaDebug('Merit Store answered HTTP ' + r.status + ' (showing Fleet values)'); return; }
     var q = await r.json();
-    if (!q || !q.found) return;
+    if (!q || !q.found) { quotaDebug('cadet "' + name + '" not found in Merit Store (showing Fleet values)'); return; }
     if (!currentCadet || currentCadet.name !== name) return; // searched someone else meanwhile
     if (typeof q.dr === 'number') document.getElementById('rQDR').textContent = q.dr;
     if (typeof q.ed === 'number') document.getElementById('rQED').textContent = q.ed;
-  } catch (e) { /* keep Fleet's own numbers */ }
+    quotaDebug('Merit Store (ED ' + q.ed + ', DR ' + q.dr + (q.dr === null ? ' - set the semester dates in Merit Store Admin' : '') + ', as of ' + q.asOf + ')');
+  } catch (e) {
+    quotaDebug('could not reach Merit Store: ' + (e && e.name === 'AbortError' ? 'timed out' : 'blocked or offline (check the address and CORS)') + ' (showing Fleet values)');
+  }
 }
 
 async function searchCadet(name) {
