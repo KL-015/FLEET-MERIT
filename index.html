@@ -605,7 +605,9 @@ window.addEventListener('load', function(){
 <!-- AdSense — loaded only when ads enabled in admin -->
 <script>
 (async function(){
-  const db2 = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const u = window.SUPABASE_URL || SUPABASE_URL;
+  const k = window.SUPABASE_ANON_KEY || SUPABASE_ANON_KEY;
+  const db2 = supabase.createClient(u, k);
   const {data} = await db2.from('site_settings').select('value').eq('key','ads_enabled').single();
   if(data?.value === 'true'){
     // Add AdSense script

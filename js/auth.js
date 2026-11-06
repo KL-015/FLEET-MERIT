@@ -4,7 +4,11 @@ let _isEncoder = false;
 let _isAdmin = false;
 
 function getDB() {
-  if (!_db) _db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  if (!_db) {
+    const u = window.SUPABASE_URL || SUPABASE_URL;
+    const k = window.SUPABASE_ANON_KEY || SUPABASE_ANON_KEY;
+    _db = supabase.createClient(u, k);
+  }
   return _db;
 }
 

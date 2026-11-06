@@ -13,6 +13,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// Secure config endpoint serving environment variables
+app.get('/api/config', (req, res) => {
+  res.json({
+    supabaseUrl: process.env.SUPABASE_URL || 'https://bgxgdgoegnjxuzatiqed.supabase.co',
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJneGdkZ29lZ25qeHV6YXRpcWVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MzQyODYsImV4cCI6MjA5MTAxMDI4Nn0.Vx-g40-0g4BRtX6n6zTQ6F9eHVzQoWcKDJGa3GjhWCY',
+    siteUrl: process.env.SITE_URL || 'https://fleethro.netlify.app'
+  });
+});
+
 // Serve static files from root directory
 app.use(express.static(__dirname));
 
@@ -24,3 +33,4 @@ app.get('/', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
+
